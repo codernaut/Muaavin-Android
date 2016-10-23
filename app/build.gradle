@@ -31,8 +31,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.facebook.android:facebook-android-sdk:4.0.0'
-    compile files('libs/json-simple-1.1.1.jar')
-    compile files('libs/apache-httpcomponents-httpclient.jar')
-    compile files('libs/apache-httpcomponents-httpcore.jar')
-    compile files('libs/org.apache.commons.io.jar')
+    compile 'com.github.cliftonlabs:json-simple:2.1.1'
+    compile 'org.apache.httpcomponents:httpclient-osgi:4.5.2'
+    compile 'org.apache.httpcomponents:httpcore-niossl:4.0-alpha6'
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
 }
