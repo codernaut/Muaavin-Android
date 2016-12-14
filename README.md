@@ -1,2 +1,0 @@
-# Muaavin-Android
-Muaavin

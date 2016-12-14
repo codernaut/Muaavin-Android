@@ -1,337 +1,219 @@
 package com.cfp.muaavin.facebook;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.telecom.Call;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cfp.muaavin.ui.FacebookLoginActivity;
-import com.cfp.muaavin.ui.MainActivity;
-import com.cfp.muaavin.ui.MenuActivity;
+import com.cfp.muaavin.web.User;
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
+import com.facebook.Profile;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  *
  */
     public class FacebookUtil {
 
-    TextView textView;
-    CallbackManager callback_manager;
 
-    Context context;
-    LoginButton login_button;
     public ArrayList<Post> User_Posts = new ArrayList<Post>();
-    public ArrayList<Friend> friend_list = new ArrayList<Friend>();
+    public ArrayList<Friend> friend_list;
+    public static ArrayList<User> Commented_users;
+    public static PostDetail ReportPostDetail = new PostDetail();
+    public String user_id= AccessToken.getCurrentAccessToken().getUserId();
+    public static ArrayList<String> friendsIds = new ArrayList<String>();
+    public static  ArrayList<User> users = new ArrayList<User>();
+    public static ArrayList<String> BlockedUsersIds = new ArrayList<String>();
+    public static ArrayList<Post> Posts = new ArrayList<Post>();
+    public static ArrayList<String> PostIds = new ArrayList<String>();
 
 
-   /* public void login(LoginButton lb , Context c, CallbackManager call_back_manager)
-    {
-
-                        context = c;
-
-                        callback_manager = call_back_manager;
-                        login_button = lb;
-                        // callbackManager = CallbackManager.Factory.create();
-                        // callback_manager = call_back_manager;
-                        LoginManager.getInstance().registerCallback(call_back_manager,
-                        new FacebookCallback<LoginResult>() {
-                        @Override
-                        public void onSuccess(LoginResult loginResult) {
-                            // App code
-                            login_button.setReadPermissions(Arrays.asList("public_profile", "user_friends"));
-                            //Toast.makeText(MainActivity.this, "Login Successful",
-                            //       Toast.LENGTH_LONG).show();
+    public ArrayList<Friend> getFriends(ArrayList<User> users) {
 
 
-                            ////////////////////////////////
+        friend_list = new ArrayList<Friend>();
+        for (int j = 0; j <= users.size()/2; j++) {
 
-                            Intent intent = new Intent(context, MenuActivity.class);
-                            intent.putExtra("User_Posts", User_Posts);
-                            intent.putExtra("User_friends", friend_list);
-                            context.startActivity(intent);
-
-                            //////////////////////////////
-
-                            //////////////////////////////////////////////////////// Get User Posts
-                            getPosts();
-
-                            ////////////////////////////////////////////////////////// Get Friends List
-                            Populate_Friendlist();
-
-                        }
-
-                        @Override
-                        public void onCancel() {
-                            // App code
-                            //  Toast.makeText(MainActivity.this, "Cancel",
-                            //        Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onError(FacebookException exception) {
-                            // App code
-                            // Toast.makeText(MainActivity.this, "Error",
-                            //         Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-
-
-
-    }
-*/
- /*         public void getPosts(){
-
-            // Context context = c;
-
-            // LoginManager.getInstance().logInWithReadPermissions(c, Arrays.asList("user_status", "user_photos", "user_videos", "user_tagged_places", "user_actions.video", "user_posts", "user_friends", "public_profile", "read_custom_friendlists"));
-                Bundle params = new Bundle();
-                params.putString("fields", "message,full_picture,story,created_time,picture");
-                new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/me/feed",
-                params,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-
-                        getJsonDataPosts(response);
-
-                    }
-                }
-        ).executeAsync();
-
-
-
-    }
-*/
- /*   public  ArrayList<Friend> getFriends()
-    {
-
-            Friend fr = new Friend();
-            fr.name = "abc";
-            fr.id = 1;
-            friend_list.add(fr);
-            fr = new Friend();
-            fr.name = "lmn";
-            fr.id = 2;
-            friend_list.add(fr);
-            fr = new Friend();
-            fr.name = "xyz";
-             fr.id = 3;
-            friend_list.add(fr);
-
-           // friend_list.add("abc");
-           // friend_list.add("xyz");
-           // friend_list.add("lmn");
-
-
-
+            Friend friend = initializeFriend(j, users);
+            friend_list.add(friend);
+        }
+        FacebookLoginActivity.friend_list = friend_list;
         return friend_list;
-    }
-
-*/
- /*     public void Populate_Friendlist()
-      {
-
-                Bundle params1 = new Bundle();
-                params1.putString("fields", "name");
-                new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/" + AccessToken.getCurrentAccessToken().getUserId() + "/friends",
-
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-
-
-                        //Populate_Friendlist(response);
-
-                        ///////////////
-                        String sa = String.valueOf("Text2 " + response.getJSONObject());
-                        //tv2.setText(sa);
-                        // Toast.makeText(MainActivity.this, "Text2 " + sa,
-                        //        Toast.LENGTH_LONG).show();
-
-                        JSONObject jobj = ( response.getJSONObject());
-
-                        JSONArray jArray =    jobj.optJSONArray("Data");
-                        if(jArray == null)
-                        {
-
-                            return;
-
-                        }
-
-
-                        for(int i = 0; i  < jArray.length(); i++)
-                        {
-
-                            JSONObject jsonObj =  jArray.optJSONObject(i);
-                            String name = jsonObj.optString("name");
-                            Double id = jsonObj.optDouble("id");
-
-                            Friend friend = new Friend();
-                            friend.name = name;
-                            friend.id = id;
-
-                            friend_list.add(friend);
-
-                        }
-                        return;
-
-
-                        //////////////
-
-                    }
-                }
-        ).executeAsync();
-
-
 
     }
-*/
- /*   public void getJsonDataPosts(GraphResponse response)
-    {
 
-        ///////////////
-        //String s = String.valueOf(response.getJSONObject());
-        //tv.setText(s);
+    public ArrayList<Post> getJsonDataPosts(GraphResponse response, ArrayList<Post> User_Posts) {
 
-        //////////////
+        user_id = AccessToken.getCurrentAccessToken().getUserId();
         JSONObject jObjResponse = response.getJSONObject();
         JSONArray data = jObjResponse.optJSONArray("data");
 
 
-        int check = 0;
-        String str = "";
-        UserData user_data= new UserData();
-
         for (int i = 0; i < data.length(); i++) {
             JSONObject subdata = data.optJSONObject(i);
-            str = "";
-            if (subdata.has("message")) {
 
-                user_data.message = "Message :" + subdata.optString("message");
-
-                str =str +  user_data.message + "\n";
-
-                check = check + 1;
-
-            }
-
-            if (subdata.has("id")) {
-
-                //user_data.message = "Message :" + subdata.optString("message");
-
-                // str =str +  user_data.message + "\n";
-
-                // check = check + 1;
-
-                user_data.post_id = subdata.optString("id");
-
-                //str = str + "User post id"+ user_data.post_id;
-
-            }
-
-
-
-            if (subdata.has("story")) {
-
-                user_data.story = "Story :" + subdata.optString("story");
-
-                str = str + user_data.story + "\n";
-
-                check = check + 1;
-
-
-            }
-
-            if (subdata.has("created_time")) {
-
-                user_data.created_time = "Created Time :" + subdata.optString("created_time");
-
-                str = str + user_data.created_time + "\n";
-
-
-
-                check = check + 1;
-
-
-
-
-            }
-
-            if (subdata.has("full_picture")) {
-
-                user_data.full_picture = subdata.optString("full_picture");
-
-
-                Post post = new Post();
-                post.message = (user_data.full_picture);
-                post.id = user_data.post_id;
-
+            int check = 0;
+           Post post =  getPost( subdata , check);
+            if((!post.message.equals("") || !post.image.equals("")))
+            {
                 User_Posts.add(post);
 
-
             }
-
-
-
-            if (check > 0) {
-
-
-                // arr.add(str);
-
-                Post post = new Post();
-                post.message = (str);
-                post.id = user_data.post_id;
-
-                User_Posts.add(post);
-
-                check = 0;
-
-            }
-
-        }
-        //tv.setText(str);
-
-        // setArrayAdapte();
-        str = "";
-        for(int i = 0 ; i < User_Posts.size() ; i++ )
-        {
-
-            str = str + User_Posts.get(i).message + " " + "id :"+ User_Posts.get(i).id +" ";
 
 
         }
+        return User_Posts;
+    }
 
-        //tv.setText(str);
+
+    public String getProfile_pic(GraphResponse response) {
+
+        JSONObject content = response.getJSONObject();
+        JSONObject data = content.optJSONObject("data");
+        String url = data.optString("url");
+
+
+        return url;
+    }
+
+    public PostDetail getReportedPostDetail(int index, JSONObject jsonChildNode) {
+
+        PostDetail PostDetailObj = new PostDetail();
+        PostDetailObj.ParentComment_ID = jsonChildNode.optString("Parent_CommentID");
+        PostDetailObj.infringing_user_name = jsonChildNode.optString("infringingUser_name");
+        PostDetailObj.coment_id = jsonChildNode.optString("CommentID");
+        PostDetailObj.comment = jsonChildNode.optString("Comment");
+        PostDetailObj.post_id = jsonChildNode.optString("Post_ID");
+        PostDetailObj.PostUrl = "https://www.facebook.com/" + PostDetailObj.post_id;
+        PostDetailObj.post_Detail = jsonChildNode.optString("Post_Detail");
+        PostDetailObj.post_image = jsonChildNode.optString("Post_Image");
+        PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic");
+        PostDetailObj.unlike_value = jsonChildNode.optInt("unlike_value");
+
+
+        return PostDetailObj;
 
 
     }
 
+    public Friend initializeFriend(int index ,ArrayList<User> users ) {
 
-*/
+        Friend friend = new Friend();
+        friend.name = users.get(index).name;
+        friend.id = users.get(index).id;
+        friend.profile_pic = users.get(index).profile_pic;
+        friend.profile_url = "https://www.facebook.com/" + users.get(index).id;
 
+
+        return friend;
+
+    }
+
+
+
+    public ArrayList<User> getUsers() {
+
+        return users;
+    }
+
+    public ArrayList<Comment> getJsonComments(JSONObject json_object, String post_id, String Parent_comment_id, ArrayList<Comment> comments)
+    {
+
+        JSONArray data = json_object.optJSONArray("data");
+
+        for (int i = 0; i < data.length(); i++) {
+
+            JSONObject obj = data.optJSONObject(i);
+            JSONObject from = obj.optJSONObject("from");
+            Comment comment = new Comment();
+            comment.name = from.optString("name");
+            comment.user_id = from.optString("id");
+            comment.comment_id = obj.optString("id");
+            comment.parent_comment_id = Parent_comment_id;
+            comment.post_id = post_id;
+            comment.message = obj.optString("message");
+
+            ////
+            JSONObject picture = from.optJSONObject("picture");
+            JSONObject picture_data = picture.optJSONObject("data");
+            String url = picture_data.optString("url");
+
+            if (obj.has("comments")) {
+                JSONObject replies = obj.optJSONObject("comments");
+                comments = getJsonComments(replies, post_id, comment.comment_id, comments); // passing the existing comments Arraylist
+            }
+
+            if (!friendsIds.contains(comment.user_id)&& (!BlockedUsersIds.contains(comment.user_id)) && (!comment.user_id.equals(user_id))) {
+                friendsIds.add(comment.user_id);
+
+                User user = new User();
+                user.id = comment.user_id;
+                user.name = comment.name;
+                user.profile_url = "https://www.facebook.com/" + comment.user_id;
+                user.profile_pic = url;
+
+
+                users.add(user);
+            }
+
+            comments.add(comment);
+
+        }
+
+        return comments;
+
+    }
+
+
+    public Post getPost(JSONObject subdata , int check)
+    {
+
+        Post post1 = new Post();
+        if (!subdata.has("comments")) {
+           // return post1;
+        }
+        if (subdata.has("message")) {
+            check = check + 1;
+            post1.message += "Message :" + subdata.optString("message") + "\n" + " " + "\n";
+        }
+        if (subdata.has("id")) {
+            post1.id = subdata.optString("id");
+            check = check + 1;
+        }
+        if (subdata.has("story")) {
+            check = check + 1;
+            post1.message = post1.message + subdata.optString("story") + "\n" + " " + "\n";
+        }
+        if (subdata.has("created_time")) {
+            post1.message = post1.message + "Created Time :" + subdata.optString("created_time") + "\n";
+            check = check + 1;
+        }
+        if (subdata.has("full_picture")) {
+            post1.image = subdata.optString("full_picture");
+            check = check + 1;
+        }
+        if (check > 0)// isData Available
+        {
+             post1.post_url = "https://www.facebook.com/" + post1.id;
+             if( subdata.has("comments"))
+             {
+                 post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>());
+             }
+
+            if(!PostIds.contains(post1.id))
+            {
+                PostIds.add(post1.id);
+                Posts.add(post1);
+            }
+        }
+
+
+        return post1;
+
+    }
 }

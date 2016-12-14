@@ -5,10 +5,21 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.widget.EditText;
 import android.widget.TextView;
 
+import com.cfp.muaavin.facebook.AsyncResponsePosts;
+import com.cfp.muaavin.facebook.AsyncResponsePostsDet;
+import com.cfp.muaavin.facebook.FacebookUtil;
+import com.cfp.muaavin.facebook.UserInterface;
+
+
+import com.cfp.muaavin.facebook.Friend;
+import com.cfp.muaavin.facebook.Post;
+import com.cfp.muaavin.facebook.PostDetail;
+import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.ui.R;
+import com.cfp.muaavin.ui.WebServiceActivity;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,116 +32,119 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
 
+    FacebookUtil facebookUtil = new FacebookUtil();
     private String Content;
     public Activity activity;
-
     public static Activity a;
-
-
     TextView uiUpdate;
     TextView jsonParsed ;
-    int sizeData = 0;
-    EditText serverText;
 
     public static Context context ;
     private String Error = null;
     private ProgressDialog Dialog ;
     String data ="";
+    int check;
+    public UserInterface UserInterfaceDelegate = null;
+    public AsyncResponsePostsDet PostDetailDelegate = null;
+    public AsyncResponsePosts Postdelegate = null;
+    int total_unlikes;
 
-    public   WebHttpGetReq(Context c , Activity a)
+    ArrayList<Friend> Common_FriendsIds = new ArrayList<Friend>();
+
+
+    /* public   WebHttpGetReq(Context c ,  int check )
+     {
+
+         context  = c;
+         this.check = check;
+         Dialog = new ProgressDialog(context);
+         uiUpdate = (TextView) activity.findViewById(R.id.output);
+         jsonParsed = (TextView) activity.findViewById(R.id.jsonParsed);
+         this.userInterfaceDelegate = delegate;
+
+     } */
+    public   WebHttpGetReq(Context c, Activity activity ,int check, AsyncResponsePosts PostDelegate, UserInterface userInterfaceDelegate)
     {
-
         context  = c;
-        activity = a;
-
+        this.check = check;
         Dialog = new ProgressDialog(context);
-
-        uiUpdate = (TextView) activity.findViewById(R.id.output);
-        jsonParsed = (TextView) activity.findViewById(R.id.jsonParsed);
-
-        serverText = (EditText) activity.findViewById(R.id.serverText);
+        Postdelegate = PostDelegate;
+        UserInterfaceDelegate = userInterfaceDelegate;
+        this.activity = activity;
 
     }
+    public   WebHttpGetReq(Context c, int check, TextView text_view, int value)
+    {
+        context  = c;
+        this.check = check;
+        Dialog = new ProgressDialog(context);
+        uiUpdate = text_view;
+        total_unlikes = value;
+    }
+
+
+
+    public   WebHttpGetReq(Context c , Activity a, int check , AsyncResponsePostsDet delegate) {
+
+        context = c;
+        activity = a;
+        this.check = check;
+        Dialog = new ProgressDialog(context);
+        uiUpdate = (TextView) activity.findViewById(R.id.output);
+        jsonParsed = (TextView) activity.findViewById(R.id.jsonParsed);
+        PostDetailDelegate = delegate;
+    }
+
+
 
     @Override
     protected void onPreExecute() {
 
-        //Start Progress Dialog (Message)
-
         Dialog.setMessage("Please wait..");
         Dialog.show();
 
-        try{
-            // Set Request parameter
-            data +="&" + URLEncoder.encode("data", "UTF-8") + "="+serverText.getText();
+        try{ data +="&" + URLEncoder.encode("data", "UTF-8") + "=";}//+serverText.getText();
 
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        catch (UnsupportedEncodingException e) {  e.printStackTrace();  }
 
     }
 
     @Override
     protected Void doInBackground(String... params) {
-        // TODO Auto-generated method stub
+
         BufferedReader reader=null;
 
-        // Send data
         try
         {
-
-            // Defined URL  where to send data
             URL url = new URL(params[0]);
 
-            // Send POST data request
-
             URLConnection conn = url.openConnection();
-
 
             conn.setDoOutput(true);
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write( data );
             wr.flush();
 
-
             // Get the server response
-
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String line = null;
 
             // Read Server Response
-            while((line = reader.readLine()) != null)
-            {
-                // Append server response in string
-                sb.append(line + "");
-
-            }
-
-            // Append Server Response To Content String
+            while((line = reader.readLine()) != null){ sb.append(line + ""); }
             Content = sb.toString();
         }
 
-        catch(Exception ex)
-        {
-            Error = ex.getMessage();
-        }
-        finally
-        {
-            try
-            {
+        catch(Exception ex){ Error = ex.getMessage(); }
 
-                reader.close();
-            }
-
-            catch(Exception ex) {}
-        }
-
+        finally{ try{ reader.close(); } catch(Exception ex) {ex.printStackTrace();} }
         return null;
     }
 
@@ -142,58 +156,159 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
         if (Error != null) {
 
-            uiUpdate.setText("Output : "+Error);
+            //uiUpdate.setText("Output : "+Error);
+            Content = "Output : "+Error;
 
         } else {
 
-            // Show Response Json On Screen (activity)
-            uiUpdate.setText( Content );
-
-            /****************** Start Parse Response JSON Data *************/
-
             String OutputData = "";
             JSONObject jsonResponse;
-
+            JSONArray jsonArray;
             try {
 
+                Content = AesEncryption.decrypt(Content);
+                String str = "";
 
-                jsonResponse = new JSONObject(Content);
+                if(check == 0 ) {
+                    uiUpdate = (TextView) activity.findViewById(R.id.output);
+                    uiUpdate.setText(Content);
+                    WebServiceActivity.response = Content;
+                    return;
+                }
+
+                if ((check == 1)||(check == 9)) {
+
+                    ArrayList<String> BlockedUserIds = new ArrayList<String>();
+                    jsonArray = new JSONArray(Content);
+                    for (int i = 0; i < jsonArray.length(); i++)
+                    {
+                        Friend friend = new Friend();
+                        JSONObject jsonChildNode = jsonArray.optJSONObject(i);
+                        String user_name = jsonChildNode.optString("User_Name");
+                        String user_id = jsonChildNode.optString("User_ID");
+                        friend.name = user_name;
+                        friend.id = user_id;
+                        BlockedUserIds.add(user_id);
+                        str = str + String.valueOf(user_name) + "\n";
+                        Common_FriendsIds.add(friend);
+                    }
+
+                    if(check == 1) { UserInterfaceDelegate.getReportedFriends(Common_FriendsIds); }
 
 
-                JSONArray jsonMainNode = jsonResponse.optJSONArray("Android");
+                    else if(check == 9){  UserInterfaceDelegate.getBlockedUsers(BlockedUserIds); }
+                }
 
-                /// Process each JSON Node ///
-
-                int lengthJsonArr = jsonMainNode.length();
-
-                for(int i=0; i < lengthJsonArr; i++)
+                else if(check == 2)
                 {
 
-                    JSONObject jsonChildNode = jsonMainNode.getJSONObject(i);
+                    jsonArray = new JSONArray(Content);
+                    ArrayList<PostDetail> JsonPostDetails = new ArrayList<PostDetail>();
+                    HashMap<String, ArrayList<PostDetail>> dictionary = new HashMap<String, ArrayList<PostDetail>>();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+
+                        JSONObject jsonChildNode = jsonArray.optJSONObject(i);
+                        PostDetail PostDetailObj = facebookUtil.getReportedPostDetail(i,jsonChildNode);//new PostDetail();
+                        JsonPostDetails.add(PostDetailObj);
+
+                        if(dictionary.containsKey(PostDetailObj.post_id)) {
+                            ArrayList<PostDetail> reportedPostDetail = (ArrayList<PostDetail>) dictionary.get(PostDetailObj.post_id);
+                            reportedPostDetail.add(PostDetailObj);
+                            dictionary.put(PostDetailObj.post_id,reportedPostDetail);
+
+                        }
+
+                        else
+                        {
+                            ArrayList<PostDetail> PostDetailslist = new ArrayList<PostDetail>();
+                            PostDetailslist.add(PostDetailObj);
+                            dictionary.put(PostDetailObj.post_id,PostDetailslist);
+                        }
+
+                    }
+
+                    PostDetailDelegate.getPostsDetails(dictionary);
+
+                }
+
+                else if(check == 3)
+                {
+                    if(Content.equals("record successfully inserted"))
+                    {
+
+                        total_unlikes=total_unlikes+1;
+                        uiUpdate.setText(String.valueOf(total_unlikes));
+                    }
+                    else
+                    {
+                        total_unlikes=total_unlikes-1;
+                        uiUpdate.setText(String.valueOf(total_unlikes));
 
 
+                    }
 
+                }
+
+                else if(check == 4)
+                {
+
+                    jsonArray = new JSONArray(Content);
+                    ArrayList<Post> Posts = new ArrayList<Post>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+
+                        Post post = new Post();
+                        JSONObject jsonChildNode = jsonArray.optJSONObject(i);
+                        post.message = jsonChildNode.optString("Post_Detail");
+                        post.id = jsonChildNode.optString("Post_ID");
+                        post.image = jsonChildNode.optString("Post_Image");
+                        post.post_url = "https://www.facebook.com/"+ post.id;
+
+                        Posts.add(post);
+                    }
+
+                    Postdelegate.getUserAndPostData(Posts);
+
+                }
+
+                else if(check == 5)
+                {
+
+                    if(Content.equals("User Already Blocked"))
+                        User.user_authentication = false;
+                    else User.user_authentication = true;
 
                 }
 
 
 
+            } catch (JSONException e) {
 
-
-                //jsonParsed.setText( OutputData );
-
-            }
-
-
-            catch (JSONException e) {
-
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            //jsonParsed.setText(Content);
-
         }
     }
+
+    public   void callOnUiThread()
+    {
+        if(Content.equals("record successfully inserted"))
+        {
+
+            total_unlikes=total_unlikes+1;
+            uiUpdate.setText(String.valueOf(total_unlikes));
+        }
+        else
+        {
+            total_unlikes=total_unlikes-1;
+            uiUpdate.setText(String.valueOf(total_unlikes));
+        }
+
+    }
+
+
 
 }
 

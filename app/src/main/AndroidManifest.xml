@@ -3,6 +3,9 @@
     package="com.cfp.muaavin.ui" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
 
     <provider
         android:name="com.facebook.FacebookContentProvider"
@@ -13,17 +16,16 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:debuggable="true">
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -67,15 +69,26 @@
         <activity
             android:name=".FacebookLoginActivity"
             android:label="@string/title_activity_facebook_login" >
-
-
         </activity>
         <activity
             android:name=".WebServiceActivity"
             android:label="@string/title_activity_web_service" >
-
-
-
+        </activity>
+        <activity
+            android:name=".Post_ListView"
+            android:label="@string/title_activity_list_view" >
+        </activity>
+        <activity
+            android:name=".Users_ListView"
+            android:label="@string/title_activity_users__list_view" >
+        </activity>
+        <activity
+            android:name=".Browse_Activity"
+            android:label="@string/title_activity_browse_" >
+        </activity>
+        <activity
+            android:name=".BrowsePost_ListView"
+            android:label="@string/title_activity_browse_post__list_view" >
         </activity>
     </application>
 

@@ -17,8 +17,16 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
+
+
+
     }
     buildTypes {
+
+        debug{
+            debuggable true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -32,7 +40,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.facebook.android:facebook-android-sdk:4.0.0'
     compile 'com.github.cliftonlabs:json-simple:2.1.1'
-    compile 'org.apache.httpcomponents:httpclient-osgi:4.5.2'
-    compile 'org.apache.httpcomponents:httpcore-niossl:4.0-alpha6'
-    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+
+
+
 }
