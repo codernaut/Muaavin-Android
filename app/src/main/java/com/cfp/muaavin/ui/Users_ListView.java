@@ -42,7 +42,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
         FacebookUtil.users = new ArrayList<User>();
         FacebookUtil.friendsIds = new ArrayList<String>();
         LoadPostsAyscncTask.count = 0; // if Paging Completed then set count = 0;
-        new LoadPostsAyscncTask(context, Users_ListView.this, User_SignedIn_id, isClipboardData,"",User_posts, new ArrayList<User>()).execute(User_posts);/*.execute(User_Posts)*/;
+        new LoadPostsAyscncTask(context, Users_ListView.this, User_SignedIn_id, isClipboardData,"",User_posts, new ArrayList<User>()).execute(User_posts);
 
 
     }
@@ -53,6 +53,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
 
         User_posts = result;
         Unique_users = FacebookUtil.users;
+        FacebookUtil.getFriends(Unique_users);
         ListView lv=(ListView) findViewById(R.id.listView2);
         Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, /*User_posts*/FacebookUtil.Posts, User_SignedIn_id,/*Unique_users*/FacebookUtil.users);
         lv.setAdapter(c);

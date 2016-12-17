@@ -1,5 +1,6 @@
 package com.cfp.muaavin.facebook;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.cfp.muaavin.ui.FacebookLoginActivity;
@@ -18,11 +19,11 @@ import java.util.ArrayList;
 /**
  *
  */
-    public class FacebookUtil {
+    public class FacebookUtil  {
 
 
     public ArrayList<Post> User_Posts = new ArrayList<Post>();
-    public ArrayList<Friend> friend_list;
+
     public static ArrayList<User> Commented_users;
     public static PostDetail ReportPostDetail = new PostDetail();
     public String user_id= AccessToken.getCurrentAccessToken().getUserId();
@@ -33,11 +34,12 @@ import java.util.ArrayList;
     public static ArrayList<String> PostIds = new ArrayList<String>();
 
 
-    public ArrayList<Friend> getFriends(ArrayList<User> users) {
+
+    public static ArrayList<Friend> getFriends(ArrayList<User> users) {
 
 
-        friend_list = new ArrayList<Friend>();
-        for (int j = 0; j <= users.size()/2; j++) {
+        ArrayList<Friend> friend_list = new ArrayList<Friend>();
+        for (int j = 0; j <= 20; j++) {
 
             Friend friend = initializeFriend(j, users);
             friend_list.add(friend);
@@ -53,19 +55,16 @@ import java.util.ArrayList;
         JSONObject jObjResponse = response.getJSONObject();
         JSONArray data = jObjResponse.optJSONArray("data");
 
-
-        for (int i = 0; i < data.length(); i++) {
+        for (int i = 0; i < data.length(); i++)
+        {
             JSONObject subdata = data.optJSONObject(i);
-
             int check = 0;
-           Post post =  getPost( subdata , check);
+            Post post =  getPost( subdata , check);
+
             if((!post.message.equals("") || !post.image.equals("")))
             {
                 User_Posts.add(post);
-
             }
-
-
         }
         return User_Posts;
     }
@@ -76,8 +75,6 @@ import java.util.ArrayList;
         JSONObject content = response.getJSONObject();
         JSONObject data = content.optJSONObject("data");
         String url = data.optString("url");
-
-
         return url;
     }
 
@@ -101,7 +98,7 @@ import java.util.ArrayList;
 
     }
 
-    public Friend initializeFriend(int index ,ArrayList<User> users ) {
+    public static Friend initializeFriend(int index ,ArrayList<User> users ) {
 
         Friend friend = new Friend();
         friend.name = users.get(index).name;
@@ -183,6 +180,7 @@ import java.util.ArrayList;
         }
         if (subdata.has("id")) {
             post1.id = subdata.optString("id");
+            post1.post_url = "https://www.facebook.com/" + post1.id;
             check = check + 1;
         }
         if (subdata.has("story")) {
@@ -199,21 +197,15 @@ import java.util.ArrayList;
         }
         if (check > 0)// isData Available
         {
-             post1.post_url = "https://www.facebook.com/" + post1.id;
-             if( subdata.has("comments"))
-             {
-                 post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>());
-             }
+           if( subdata.has("comments")){ post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>()); }
 
-            if(!PostIds.contains(post1.id))
+           if(!PostIds.contains(post1.id))
             {
-                PostIds.add(post1.id);
-                Posts.add(post1);
+                PostIds.add(post1.id); Posts.add(post1);
             }
         }
-
-
         return post1;
-
     }
+
+
 }

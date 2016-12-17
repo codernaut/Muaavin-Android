@@ -14,6 +14,7 @@ public class User implements Serializable {
     public String profile_pic;
     public String profile_url;
     public static boolean user_authentication;
+    public String state;
 
    public User()
    {
@@ -33,7 +34,17 @@ public class User implements Serializable {
         user.id = AccessToken.getCurrentAccessToken().getUserId();
         user.name = profile.getFirstName() + " " + profile.getLastName();
         user.profile_pic = (profile.getProfilePictureUri(20, 20).toString());
+        user.state = "UnBlocked";
         return user;
 
+    }
+
+    public  void setUserInformation(String user_id , String user_name, String profilePic, String profileUrl, String State) {
+
+        id  = user_id;
+        name = user_name;
+        profile_pic = profilePic;
+        profile_url = profileUrl;
+        state = State;
     }
 }

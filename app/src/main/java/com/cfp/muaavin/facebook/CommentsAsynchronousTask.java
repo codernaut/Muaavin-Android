@@ -35,6 +35,7 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
 
 
 
+
     public AsyncResponseComments delegate = null;
 
 
@@ -44,6 +45,7 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
         this.delegate = delegate;
         this.check = check;
         user_id = user_signedin_ID;
+
     }
 
     @Override
@@ -83,8 +85,6 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
 
         MenuActivity.check = check;
         delegate.getAllComments(result);
-
-
     }
 
     public  ArrayList<Comment> getJsonComments(GraphResponse response, String post_id ,String parent_CommentID, int isReply)
@@ -126,7 +126,6 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
                 if(!friendsIds.contains(comment1.user_id)&&(!comment1.user_id.equals(user_id)))
                 {
                     friendsIds.add(comment1.user_id);
-
                     User user = new User();
                     user.id = comment1.user_id;
                     user.name = comment1.name;

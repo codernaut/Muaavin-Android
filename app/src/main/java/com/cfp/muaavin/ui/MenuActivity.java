@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 
 
-public  class MenuActivity extends ActionBarActivity implements AsyncResponseComments , AsyncResponsePosts , UserInterface {
+public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePosts , UserInterface {
 
     FriendManagement  friend_management;
     ArrayList<Post> User_Posts = new ArrayList<Post>();
@@ -50,7 +50,7 @@ public  class MenuActivity extends ActionBarActivity implements AsyncResponseCom
         String serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUser?user_id="+user_id;
         //new WebHttpGetReq(contex, 5,null, this).execute(serverURL);
         serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
-        new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
+        //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
 
 
     }
@@ -80,20 +80,7 @@ public  class MenuActivity extends ActionBarActivity implements AsyncResponseCom
     }
 
 
-    @Override
-    public void getAllComments(ArrayList<Post> result) {
-        ClipBoard_Posts = result;
 
-        if(check ==  1)
-        {
-            friend_management.reportFriends(users_comments, contex, User_Posts, user_id, users_comments);
-        }
-
-        else if(check == 2)
-        {
-            friend_management.Highlights(contex);
-        }
-    }
 
 
     @Override

@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cfp.muaavin.helper.AesEncryption;
+import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.ui.Post_ListView;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.ui.Users_ListView;
@@ -73,11 +75,7 @@ public class Users_CustomAdapter extends BaseAdapter {
         final Holder holder= getHolder(rowView);
         holder.userProfile.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                showUserProfileOnBrowser(result.get(position).profile_url);
-
-            }
+            public void onClick(View v) { UrlHelper.showDataOnBrowser(context, result.get(position).profile_url); }
         });
 
         holder.tv1.setText(" "+ result.get(position).name);
@@ -85,12 +83,12 @@ public class Users_CustomAdapter extends BaseAdapter {
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try
+                {
+                    FacebookUtil.ReportPostDetail.setUserInformation(result.get(position).id,result.get(position).name, UrlHelper.getEncodedUrl(result.get(position).profile_pic),"UnBlocked");
+                } catch (Exception e) {  e.printStackTrace(); }
 
-                FacebookUtil.ReportPostDetail.infringing_user_id = result.get(position).id;
-                FacebookUtil.ReportPostDetail.infringing_user_name = result.get(position).name;
-                FacebookUtil.ReportPostDetail.infringing_user_profile_pic = result.get(position).profile_pic;
-                getDecodedImage();
-                User_selective_posts = getSelectivePosts(FacebookUtil.ReportPostDetail.infringing_user_id, User_posts );
+                User_selective_posts = getSelectivePosts(result.get(position).id, User_posts );
 
                 boolean ClipBoardOption = false;
                 Intent intent = new Intent(context, Post_ListView.class);
@@ -175,31 +173,8 @@ public class Users_CustomAdapter extends BaseAdapter {
         return selective_posts;
     }
 
-    public  void showUserProfileOnBrowser(String url)
-    {
 
-        try {
-            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        context.startActivity(facebookIntent);
 
-    }
-
-    public String getDecodedImage()
-    {
-
-        try {
-
-            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = URLEncoder.encode(FacebookUtil.ReportPostDetail.infringing_user_profile_pic, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return FacebookUtil.ReportPostDetail.infringing_user_profile_pic;
-    }
 
     public Holder getHolder( View rowView)
     {

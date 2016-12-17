@@ -58,18 +58,6 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
     ArrayList<Friend> Common_FriendsIds = new ArrayList<Friend>();
 
-
-    /* public   WebHttpGetReq(Context c ,  int check )
-     {
-
-         context  = c;
-         this.check = check;
-         Dialog = new ProgressDialog(context);
-         uiUpdate = (TextView) activity.findViewById(R.id.output);
-         jsonParsed = (TextView) activity.findViewById(R.id.jsonParsed);
-         this.userInterfaceDelegate = delegate;
-
-     } */
     public   WebHttpGetReq(Context c, Activity activity ,int check, AsyncResponsePosts PostDelegate, UserInterface userInterfaceDelegate)
     {
         context  = c;
@@ -154,20 +142,13 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
         Dialog.dismiss();
 
-        if (Error != null) {
+        if (Error != null) { Content = "Output : "+Error; }
 
-            //uiUpdate.setText("Output : "+Error);
-            Content = "Output : "+Error;
+         else {
 
-        } else {
-
-            String OutputData = "";
-            JSONObject jsonResponse;
             JSONArray jsonArray;
             try {
-
                 Content = AesEncryption.decrypt(Content);
-                String str = "";
 
                 if(check == 0 ) {
                     uiUpdate = (TextView) activity.findViewById(R.id.output);
@@ -176,7 +157,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                     return;
                 }
 
-                if ((check == 1)||(check == 9)) {
+                else if ((check == 1)||(check == 9)) {
 
                     ArrayList<String> BlockedUserIds = new ArrayList<String>();
                     jsonArray = new JSONArray(Content);
@@ -184,18 +165,11 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                     {
                         Friend friend = new Friend();
                         JSONObject jsonChildNode = jsonArray.optJSONObject(i);
-                        String user_name = jsonChildNode.optString("User_Name");
-                        String user_id = jsonChildNode.optString("User_ID");
-                        friend.name = user_name;
-                        friend.id = user_id;
-                        BlockedUserIds.add(user_id);
-                        str = str + String.valueOf(user_name) + "\n";
+                        friend.setFriendData(jsonChildNode.optString("User_ID"), jsonChildNode.optString("User_Name"));
+                        BlockedUserIds.add(jsonChildNode.optString("User_ID"));
                         Common_FriendsIds.add(friend);
                     }
-
                     if(check == 1) { UserInterfaceDelegate.getReportedFriends(Common_FriendsIds); }
-
-
                     else if(check == 9){  UserInterfaceDelegate.getBlockedUsers(BlockedUserIds); }
                 }
 
@@ -216,27 +190,21 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                             ArrayList<PostDetail> reportedPostDetail = (ArrayList<PostDetail>) dictionary.get(PostDetailObj.post_id);
                             reportedPostDetail.add(PostDetailObj);
                             dictionary.put(PostDetailObj.post_id,reportedPostDetail);
-
                         }
-
                         else
                         {
                             ArrayList<PostDetail> PostDetailslist = new ArrayList<PostDetail>();
                             PostDetailslist.add(PostDetailObj);
                             dictionary.put(PostDetailObj.post_id,PostDetailslist);
                         }
-
                     }
-
                     PostDetailDelegate.getPostsDetails(dictionary);
-
                 }
 
                 else if(check == 3)
                 {
                     if(Content.equals("record successfully inserted"))
                     {
-
                         total_unlikes=total_unlikes+1;
                         uiUpdate.setText(String.valueOf(total_unlikes));
                     }
@@ -244,8 +212,6 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                     {
                         total_unlikes=total_unlikes-1;
                         uiUpdate.setText(String.valueOf(total_unlikes));
-
-
                     }
 
                 }
@@ -256,19 +222,12 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                     jsonArray = new JSONArray(Content);
                     ArrayList<Post> Posts = new ArrayList<Post>();
                     for (int i = 0; i < jsonArray.length(); i++) {
-
                         Post post = new Post();
                         JSONObject jsonChildNode = jsonArray.optJSONObject(i);
-                        post.message = jsonChildNode.optString("Post_Detail");
-                        post.id = jsonChildNode.optString("Post_ID");
-                        post.image = jsonChildNode.optString("Post_Image");
-                        post.post_url = "https://www.facebook.com/"+ post.id;
-
+                        post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/"+jsonChildNode.optString("Post_ID"));
                         Posts.add(post);
                     }
-
                     Postdelegate.getUserAndPostData(Posts);
-
                 }
 
                 else if(check == 5)
@@ -277,17 +236,9 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                     if(Content.equals("User Already Blocked"))
                         User.user_authentication = false;
                     else User.user_authentication = true;
-
                 }
-
-
-
-            } catch (JSONException e) {
-
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            } catch (JSONException e) {  e.printStackTrace(); }
+              catch (Exception e) {  e.printStackTrace(); }
 
         }
     }

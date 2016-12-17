@@ -20,5 +20,15 @@ public class Post implements Serializable {
       post_url = "";
 
    }
+
+   public Post setPost(String id ,String message ,String image , String post_url  )
+   {
+      Post post = new Post();
+      post. id = id;
+      post. message = message;
+      post. image =image;
+      post.post_url = post_url;
+      return post;
+   }
 }
 

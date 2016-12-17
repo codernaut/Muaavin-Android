@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.ui.MenuActivity;
 import com.cfp.muaavin.ui.Post_ListView;
 import com.cfp.muaavin.ui.R;
@@ -94,7 +95,7 @@ public class Posts_CustomAdapter extends BaseAdapter {
             @Override
              public void onClick(View v) {
 
-                showPostOnBrowser(result.get(position).post_url);
+                UrlHelper.showDataOnBrowser(context,result.get(position).post_url);
             }
         });
 
@@ -108,20 +109,10 @@ public class Posts_CustomAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-
-                FacebookUtil.ReportPostDetail.post_id = result.get(position).id;
-                FacebookUtil.ReportPostDetail.post_Detail = result.get(position).message;
-                FacebookUtil.ReportPostDetail.post_image =result.get(position).image;
-                FacebookUtil.ReportPostDetail.comment = result.get(position).Comments.get(num).message;
-                FacebookUtil.ReportPostDetail.coment_id = result.get(position).Comments.get(num).comment_id;
-                FacebookUtil.ReportPostDetail.ParentComment_ID = result.get(position).Comments.get(num).parent_comment_id;
-                FacebookUtil.ReportPostDetail.comment = removeHash(FacebookUtil.ReportPostDetail.comment, "#", " ");
-                FacebookUtil.ReportPostDetail.post_Detail = removeHash(FacebookUtil.ReportPostDetail.post_Detail, "#", " ");
+                FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(result.get(position).message,"#", " "), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
+                FacebookUtil.ReportPostDetail.setCommentInformation(result.get(position).Comments.get(num).comment_id,removeHash(result.get(position).Comments.get(num).message, "#", " "), result.get(position).Comments.get(num).parent_comment_id,"");
 
                 if(ClipBoardOption) getInfringingUserDetail(position);
-
-                FacebookUtil.ReportPostDetail.post_image = getEncodedImage(FacebookUtil.ReportPostDetail.post_image);
-
 
                 DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID);
                 }
@@ -134,17 +125,7 @@ public class Posts_CustomAdapter extends BaseAdapter {
         return rowView;
     }
 
-    public String getEncodedImage(String image)
-    {
 
-        try {
-            image = URLEncoder.encode(image, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return image; //FacebookUtil.ReportPostDetail.post_image
-    }
 
     public TextView getRowTextView( String text)
     {
@@ -188,24 +169,13 @@ public class Posts_CustomAdapter extends BaseAdapter {
         return text;
     }
 
-    public void showPostOnBrowser(String url)
-    {
-        try{
-            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
-        } catch (PackageManager.NameNotFoundException e){
-            e.printStackTrace();
-        }
-        Intent facebookIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        context.startActivity(facebookIntent);
-    }
-
     public void getInfringingUserDetail(int position)
     {
 
         FacebookUtil.ReportPostDetail.infringing_user_name = MenuActivity.users.get(position).name;
         FacebookUtil.ReportPostDetail.infringing_user_id= MenuActivity.users.get(position).id;
         FacebookUtil.ReportPostDetail.infringing_user_profile_pic= MenuActivity.users.get(position).profile_pic;
-        FacebookUtil.ReportPostDetail.infringing_user_profile_pic = getEncodedImage(FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
+        FacebookUtil.ReportPostDetail.infringing_user_profile_pic = UrlHelper.getEncodedUrl(FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
 
 
     }
