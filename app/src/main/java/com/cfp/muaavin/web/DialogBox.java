@@ -34,31 +34,26 @@ import android.content.DialogInterface;
             public void onClick(DialogInterface dialog, int which) {
 
 
-                String group_name =  group[which];
-                FacebookUtil.ReportPostDetail.group_id = which+1;
+                String group_name = group[which];
+                FacebookUtil.ReportPostDetail.group_id = which + 1;
 
-                if(option == 0)
-                {
-                    Intent intent = initializeIntentData( context , group_name, user_id, option);
+                if (option == 0) {
+                    Intent intent = new Intent(context, WebServiceActivity.class);
+                    intent.putExtra("Group_name", group_name);
+                    intent.putExtra("check", option);
                     context.startActivity(intent);
-                }
+                } else if (option == 1) {
 
-                else if(option == 1)
-                {
-
-                    Intent intent = initializeIntentData( context , group_name, user_id, option);
+                    Intent intent = new Intent(context, WebServiceActivity.class);
+                    intent.putExtra("Group_name", group_name);
+                    intent.putExtra("check", option);
                     context.startActivity(intent);
 
-                }
-                else if(option == 2)
-                {
+                } else if (option == 2) {
                     Intent intent = new Intent(context, Browse_Activity.class);
                     intent.putExtra("Group_name", group_name);
                     context.startActivity(intent);
-                }
-
-                else if(option == 4)
-                {
+                } else if (option == 4) {
 
                     Intent intent = new Intent(context, BrowsePost_ListView.class);
                     intent.putExtra("Group_name", group_name);
@@ -82,11 +77,9 @@ import android.content.DialogInterface;
             builder.setTitle(" Error");
 
             builder.setMessage("Permission Error");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-            {
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int id)
-                {
+                public void onClick(DialogInterface dialog, int id) {
                     //
                 }
             });
@@ -109,49 +102,17 @@ import android.content.DialogInterface;
                     FacebookUtil.users = new ArrayList<User>();
                     FacebookUtil.friendsIds = new ArrayList<String>();
                     LoadPostsAyscncTask.count = 0;
-                    new LoadPostsAyscncTask(context, delegate, user_id, isClipboardData, post_id, new ArrayList<Post>(),new ArrayList<User>()).execute(new ArrayList<Post>());
+                    new LoadPostsAyscncTask(context, delegate, user_id, isClipboardData, post_id, new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-            {
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    boolean isClipboardData  = false;
+                public void onClick(DialogInterface dialog, int id) {
+                    boolean isClipboardData = false;
                 }
 
             });
             builder.show();
         }
-
-
-
-        public static Intent initializeIntentData(Context context , String  group_name, String user_id, int option)
-        {
-
-            Intent intent = new Intent(context, WebServiceActivity.class);
-            intent.putExtra("user_id", FacebookUtil.ReportPostDetail.infringing_user_id);
-            intent.putExtra("post_id", FacebookUtil.ReportPostDetail.post_id);
-            intent.putExtra("post_image",FacebookUtil.ReportPostDetail.post_image);
-            intent.putExtra("Group_id", FacebookUtil.ReportPostDetail.group_id);
-            intent.putExtra("Group_name", group_name);
-            intent.putExtra("check", option);
-            intent.putExtra("User_Id", user_id);
-            intent.putExtra("Infringing_User_name", FacebookUtil.ReportPostDetail.infringing_user_name);
-            intent.putExtra("Infringing_User_profilepic", FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
-            intent.putExtra("Post_detail", FacebookUtil.ReportPostDetail.post_Detail);
-            intent.putExtra("Comment",FacebookUtil.ReportPostDetail.comment);
-            intent.putExtra("Comment_ID",FacebookUtil.ReportPostDetail.coment_id);
-            intent.putExtra("ParentComment_ID",FacebookUtil.ReportPostDetail.ParentComment_ID);
-
-            return intent;
-
-
-        }
-
-
-
-
-
 
 }

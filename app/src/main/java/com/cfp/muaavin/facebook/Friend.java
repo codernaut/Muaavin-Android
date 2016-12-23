@@ -10,7 +10,6 @@ public class Friend implements Serializable {
     public String name;
     public String post_id;
     public String profile_pic;
-    public ArrayList<String> commentsList = new ArrayList<String>();
     public String profile_url;
 
     public Friend()
@@ -20,6 +19,11 @@ public class Friend implements Serializable {
         profile_pic = "";
         profile_url = "";
 
+    }
+    public void setFriendData(String id , String name)
+    {
+        this.id = id;
+        this.name = name;
     }
 
 

@@ -24,19 +24,21 @@ public class Post_ListView extends ActionBarActivity implements AsyncResponsePos
     String User_SignedIn_id;
     boolean ClipBoardOption ;
     Context context;
+    public ArrayList<Post> SelectivePosts = new ArrayList<Post>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_view);
 
-        User_Posts = (ArrayList<Post>) getIntent().getSerializableExtra("user_posts");
+        SelectivePosts = (ArrayList<Post>) getIntent().getSerializableExtra("user_posts");
+        User_Posts = new ArrayList<Post>();
         User_SignedIn_id = getIntent().getStringExtra("User_id");
         ClipBoardOption = getIntent().getBooleanExtra("ClipBoardOption", false);
         context = this;
 
         lv=(ListView) findViewById(R.id.listView1);
-        Posts_CustomAdapter c = new Posts_CustomAdapter( Post_ListView.this, User_Posts, User_SignedIn_id,ClipBoardOption);
+        Posts_CustomAdapter c = new Posts_CustomAdapter( Post_ListView.this, SelectivePosts , User_SignedIn_id,ClipBoardOption);
         lv.setAdapter(c);
     }
 
@@ -45,7 +47,6 @@ public class Post_ListView extends ActionBarActivity implements AsyncResponsePos
 
         if(LoadPostsAyscncTask.nextResultsRequests!=null)
         {
-
             new LoadPostsAyscncTask(context, Post_ListView.this, User_SignedIn_id, ClipBoardOption,"",User_Posts, new ArrayList<User>()).execute(User_Posts);
         }
     }
@@ -55,9 +56,16 @@ public class Post_ListView extends ActionBarActivity implements AsyncResponsePos
     public void getUserAndPostData(ArrayList<Post> result)
     {
         User_Posts = result;
-        User_Posts = Users_CustomAdapter.getSelectivePosts(FacebookUtil.ReportPostDetail.infringing_user_id, User_Posts);
-        Posts_CustomAdapter c = new Posts_CustomAdapter( Post_ListView.this, User_Posts, User_SignedIn_id,ClipBoardOption);
+
+        for(int i = 0 ; i < User_Posts.size(); i++)
+        {
+            //if(!SelectivePosts.contains(User_Posts.get(i)))
+            SelectivePosts.add(User_Posts.get(i));
+        }
+        SelectivePosts = Users_CustomAdapter.getSelectivePosts(FacebookUtil.ReportPostDetail.infringing_user_id, SelectivePosts);
+        Posts_CustomAdapter c = new Posts_CustomAdapter( Post_ListView.this, SelectivePosts, User_SignedIn_id,ClipBoardOption);
         lv.setAdapter(c);
+        User_Posts = new ArrayList<Post>();
 
     }
 }

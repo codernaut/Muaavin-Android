@@ -39,10 +39,11 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
 
 
         isClipboardData = false;
-        FacebookUtil.users = new ArrayList<User>();
-        FacebookUtil.friendsIds = new ArrayList<String>();
-        LoadPostsAyscncTask.count = 0; // if Paging Completed then set count = 0;
-        new LoadPostsAyscncTask(context, Users_ListView.this, User_SignedIn_id, isClipboardData,"",User_posts, new ArrayList<User>()).execute(User_posts);/*.execute(User_Posts)*/;
+        //FacebookUtil.users = new ArrayList<User>();
+        //FacebookUtil.friendsIds = new ArrayList<String>();
+        //LoadPostsAyscncTask.count = 0; // if Paging Completed then set count = 0;
+        if(FacebookUtil.users.size() > 0) { getUserAndPostData(new ArrayList<Post>()); }
+        else new LoadPostsAyscncTask(context, Users_ListView.this, User_SignedIn_id, isClipboardData,"",User_posts, new ArrayList<User>()).execute(User_posts);
 
 
     }
@@ -52,10 +53,14 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
     public void getUserAndPostData(ArrayList<Post> result) {
 
         User_posts = result;
+        Unique_users = LoadPostsAyscncTask.users;
+        ///////////
         Unique_users = FacebookUtil.users;
+        ///////////
+        FacebookUtil.getFriends(Unique_users);
         ListView lv=(ListView) findViewById(R.id.listView2);
-        Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, /*User_posts*/FacebookUtil.Posts, User_SignedIn_id,/*Unique_users*/FacebookUtil.users);
+        Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, FacebookUtil.Posts, User_SignedIn_id,Unique_users);
         lv.setAdapter(c);
-        lv.setOnScrollListener(new EndlessScrollListener(Users_ListView.this,User_posts/*FacebookUtil.Posts*/,/*Unique_users*/FacebookUtil.users,lv));
+        lv.setOnScrollListener(new EndlessScrollListener(Users_ListView.this, User_posts, Unique_users, lv));
     }
 }

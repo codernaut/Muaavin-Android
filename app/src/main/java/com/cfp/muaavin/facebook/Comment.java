@@ -14,19 +14,28 @@ public class Comment  implements Serializable {
     public String post_id;
     public String user_id;
     public String message;
+    public int reply_count = 0;
 
     public ArrayList<Comment> replies = new ArrayList<Comment>();
 
     public  Comment()
     {
-
         parent_comment_id = "";
         comment_id = "";
         user_id = "";
         name = "";
         post_id = "";
+    }
 
-
+    public void setComment(String CommentID, String ParentCommentID, String Name, String PostID ,String UserID, String Message, int ReplyCount )
+    {
+        comment_id = CommentID;
+        parent_comment_id = ParentCommentID;
+        user_id = UserID;
+        name = Name;
+        post_id = PostID;
+        message = Message;
+        reply_count = ReplyCount;
     }
 }
 

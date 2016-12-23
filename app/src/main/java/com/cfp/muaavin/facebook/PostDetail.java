@@ -17,6 +17,7 @@ public class PostDetail {
     public int unlike_value;
     public int group_id;
     public String PostUrl;
+    public String user_state;
 
 
 
@@ -33,8 +34,31 @@ public class PostDetail {
         infringing_user_id = "";
         PostUrl = "";
 
+    }
 
+    public void setUserInformation(String UserID, String UserName , String ProfilePic , String state)
+    {
+        infringing_user_id = UserID;
+        infringing_user_name = UserName;
+        infringing_user_profile_pic = ProfilePic;
+        user_state = state;
 
+    }
+
+    public void setPostInformation(String PostID, String PostDetail , String PostImage, String postUrl)
+    {
+        post_id =  PostID;
+        post_Detail = PostDetail;
+        post_image = PostImage;
+        PostUrl = postUrl;
+
+    }
+
+    public void setCommentInformation(String CommentID, String Comment , String ParentCommentID, String postUrl)
+    {
+        coment_id =  CommentID;
+        comment = Comment;
+        ParentComment_ID = ParentCommentID;
     }
 
 
