@@ -42,7 +42,7 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener, Asyn
             boolean isClipboardData = false;
             if (LoadPostsAyscncTask.nextResultsRequests != null)
             {
-                 new LoadPostsAyscncTask(context,EndlessScrollListener.this,  user.id, isClipboardData, "", User_Posts, users).execute(new ArrayList<Post>());
+                 new LoadPostsAyscncTask(context,EndlessScrollListener.this,  user.id, isClipboardData, "", /*User_Posts*/new ArrayList<Post>(), users).execute(new ArrayList<Post>());
             }
 
         }
@@ -65,6 +65,9 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener, Asyn
     public void getUserAndPostData(ArrayList<Post> result) {
 
         users = LoadPostsAyscncTask.getUsers();
+        ////////
+        users = FacebookUtil.users;
+        ////////
         User_Posts = result;
 
         Users_CustomAdapter c = new Users_CustomAdapter( context, /*User_Posts*/FacebookUtil.Posts, user.id,users);

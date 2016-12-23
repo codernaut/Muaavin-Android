@@ -47,8 +47,6 @@ public class Users_CustomAdapter extends BaseAdapter {
         context = users_viewActivity;
         user_signed_inID =  user_signed_id;
         User_posts = user_posts;
-
-
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -163,7 +161,7 @@ public class Users_CustomAdapter extends BaseAdapter {
                     post.post_url = Posts.get(i).post_url;
 
                     Comment comment1 = commentsArr.get(j);
-
+                    if(post.Comments == null){ post.Comments = new ArrayList<Comment>(); }
                     post.Comments.add(comment1);
                 }
             }

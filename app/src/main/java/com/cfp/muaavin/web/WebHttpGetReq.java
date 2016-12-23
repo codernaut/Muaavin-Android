@@ -224,7 +224,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         Post post = new Post();
                         JSONObject jsonChildNode = jsonArray.optJSONObject(i);
-                        post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/"+jsonChildNode.optString("Post_ID"));
+                        post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/"+jsonChildNode.optString("Post_ID"),0);
                         Posts.add(post);
                     }
                     Postdelegate.getUserAndPostData(Posts);

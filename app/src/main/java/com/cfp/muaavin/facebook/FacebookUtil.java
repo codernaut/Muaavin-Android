@@ -32,6 +32,7 @@ import java.util.ArrayList;
     public static ArrayList<String> BlockedUsersIds = new ArrayList<String>();
     public static ArrayList<Post> Posts = new ArrayList<Post>();
     public static ArrayList<String> PostIds = new ArrayList<String>();
+    public static ArrayList<String> PostIdsSpecific = new ArrayList<String>();
 
 
 
@@ -55,18 +56,24 @@ import java.util.ArrayList;
         JSONObject jObjResponse = response.getJSONObject();
         JSONArray data = jObjResponse.optJSONArray("data");
 
+        this.User_Posts = User_Posts;
+
+
         for (int i = 0; i < data.length(); i++)
         {
             JSONObject subdata = data.optJSONObject(i);
             int check = 0;
             Post post =  getPost( subdata , check);
+            if(!PostIdsSpecific.contains(post.id)) { PostIdsSpecific.add(post.id) ; User_Posts.add(post); }
+
+
 
             if((!post.message.equals("") || !post.image.equals("")))
             {
-                User_Posts.add(post);
+                //User_Posts.add(post);
             }
         }
-        return User_Posts;
+        return this.User_Posts;
     }
 
 
@@ -197,11 +204,15 @@ import java.util.ArrayList;
         }
         if (check > 0)// isData Available
         {
-           if( subdata.has("comments")){ post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>()); }
-
+            if(subdata.has("comments")) { post1.comment_count = subdata.optJSONObject("comments").optJSONObject("summary").optInt("total_count"); }
+          // if(( post1.comment_count = subdata.optJSONObject("summary").optInt("total_count")) > 0){
+          // if( subdata.has("comments")){ post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>()); }}
+            Post post2 = new Post();
+            post2 = post2.setPost(post1.id,post1.message,post1.image,post1.post_url , post1.comment_count);
            if(!PostIds.contains(post1.id))
             {
-                PostIds.add(post1.id); Posts.add(post1);
+                PostIds.add(post1.id); Posts.add(post2);
+                //User_Posts.add(post1);
             }
         }
         return post1;

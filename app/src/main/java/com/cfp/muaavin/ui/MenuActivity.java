@@ -51,6 +51,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         //new WebHttpGetReq(contex, 5,null, this).execute(serverURL);
         serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
         //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
+        ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
 
 
     }

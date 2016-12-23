@@ -133,9 +133,6 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
 
                     users.add(user);
                 }
-
-
-
             }
 
 
@@ -199,8 +196,6 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
 
                         if(response.getError()==null)
                         Posts.get(post_index).Comments =    getJsonComments(response, Posts.get(post_index).id,"",0);
-
-
                     }
                 }
         );

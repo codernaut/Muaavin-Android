@@ -29,17 +29,17 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     public String userId;
     GraphResponse lastGraphResponse;
     public String user_id;
-    public static ArrayList<User> users;
+    public static ArrayList<User> users = new ArrayList<User>();
     public String Post_ID;
     public static boolean PostResponse;
     public  static int count = 0;
     public static GraphRequest nextResultsRequests;
-
+    public ArrayList<Comment> comments;
+    public static ArrayList<String>  friendsIds = new ArrayList<String>();
     boolean isClipboardData;
 
 
     public LoadPostsAyscncTask(Context context, AsyncResponsePosts delegate , String user_id, boolean isClipboardData, String post_id,ArrayList<Post> Posts,ArrayList<User> users) {
-
 
         this.delegate = delegate;
         userId = user_id;
@@ -47,10 +47,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         Post_ID = post_id;
         PostResponse = true;
         this.Posts = Posts;
-        this.users=users;
         this.context = context;
-
-
     }
 
     @Override
@@ -74,25 +71,16 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
             Posts = new ArrayList<Post>();
             getPost(Post_ID);
         }
-
-        users = facebookUtil.getUsers();
-
+        FacebookUtil.users = users;
         return Posts;
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Post> result) {
-
-        if (dialog.isShowing()) {
-            dialog.dismiss();
-        }
-
+    protected void onPostExecute(ArrayList<Post> result)
+    {
+        if (dialog.isShowing()) { dialog.dismiss(); }
         delegate.getUserAndPostData(result);
-
-
     }
-
-
 
     public ArrayList<Post> getAllPosts(final ArrayList<Post> posts)
     {
@@ -100,45 +88,37 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         // 10205871243740520
         if(count == 0) {
             Bundle params = new Bundle();
-            params.putString("fields", "message,full_picture,story,created_time,picture,comments{from{id,name,picture},id,message,comments{from{id,name,picture},id,message}}");//,comments.summary(true)
+            params.putString("fields", "message,full_picture,story,created_time,picture,comments.summary(true){from{id,name,picture},id,message,comments{from{id,name,picture},id,message}}");//,comments.summary(true)
             new GraphRequest(AccessToken.getCurrentAccessToken(),
-                    "/me/feed",
-                    params,
-                    HttpMethod.GET,
-                    new GraphRequest.Callback() {
-                        public void onCompleted(GraphResponse response) {
-                            lastGraphResponse = response;
-                            Posts = facebookUtil.getJsonDataPosts(response,posts);
+            "/me/feed",
+            params,
+            HttpMethod.GET,
+            new GraphRequest.Callback() {
+            public void onCompleted(GraphResponse response) {
+            lastGraphResponse = response;
+            Posts = facebookUtil.getJsonDataPosts(response,posts);
+            getCommentsAndReplies();
+            }
+            }).executeAndWait();
 
-                        }
-                    }
-            ).executeAndWait();
-
-             nextResultsRequests = lastGraphResponse.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
+            nextResultsRequests = lastGraphResponse.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
             count = count + 1;
         }
         else if(count > 0)/*while (nextResultsRequests!=null)*/
         {
-
             if (nextResultsRequests != null)
             {
-                nextResultsRequests.setCallback(new GraphRequest.Callback()
-                {
-                    @Override
-                    public void onCompleted(GraphResponse response)
-                    {
-                        lastGraphResponse = response;
-                        Posts =  facebookUtil.getJsonDataPosts(response,posts);
-
-                    }
-                });
-                nextResultsRequests.executeAndWait();
+            nextResultsRequests.setCallback(new GraphRequest.Callback() {
+            @Override
+            public void onCompleted(GraphResponse response) {
+            lastGraphResponse = response;
+            Posts = facebookUtil.getJsonDataPosts(response, posts);
+            getCommentsAndReplies();
+            }});
+            nextResultsRequests.executeAndWait();
             }
-
             nextResultsRequests = lastGraphResponse.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
         }
-
-        //users = facebookUtil.getUsers();
         return Posts;
 
     }
@@ -149,49 +129,129 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         Bundle params = new Bundle();
         params.putString("fields", "message,full_picture,story,created_time,picture,comments.limit(900){from{id,name,picture},id,message,comments.limit(900){from{id,name,picture},id,message}}");
         GraphRequest gr = new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/"+post_id,
-                params,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                        /* handle the result */
-                        if(response.getError()==null) {
-                            JSONObject jObjResponse = response.getJSONObject();
-                            Posts.add(facebookUtil.getPost(jObjResponse, 0));
-
-                        }
-                        else {PostResponse = false;}
-
-                    }
+        AccessToken.getCurrentAccessToken(),
+        "/"+post_id,params,
+        HttpMethod.GET,
+        new GraphRequest.Callback() {
+            public void onCompleted(GraphResponse response) {
+                /* handle the result */
+                if(response.getError()==null) {
+                    JSONObject jObjResponse = response.getJSONObject();
+                    Posts.add(facebookUtil.getPost(jObjResponse, 0));
+                    getCommentsAndReplies();
                 }
-        );
+                else PostResponse = false; // Post Response - ClipBoard Post
+
+            }
+        } );
         gr.executeAndWait();
     }
 
-    public static ArrayList<User> getUsers()
-    {
-        users = facebookUtil.getUsers();
-        return users;
+    public static ArrayList<User> getUsers(){ return users; } // get All Users
 
+    public static boolean getPostResponse() { return PostResponse; } // getPostResponse_ClipBoard
+
+    public void getCommentsAndReplies()
+    {
+      int counter1 = FacebookUtil.Posts.size() - Posts.size();
+      for(int postID = 0 ;postID < Posts.size() ; postID++)
+      {
+        final  int post_index = postID;
+        if(Posts.get(post_index).comment_count >  0) {
+            getGraphApiComments(Posts.get(post_index).id, -1, post_index, counter1, true);
+            comments = Posts.get(post_index).Comments;
+        }else { comments = Posts.get(post_index).Comments = new ArrayList<Comment>(); }
+
+        if(FacebookUtil.Posts.get(counter1).Comments == null) { FacebookUtil.Posts.get(counter1).Comments = comments;  }
+
+        for(int j = 0; j < comments.size(); j++ )
+        {
+          final int comment_index = j;
+          final String CommentID = comments.get(j).comment_id;
+          if(comments.get(comment_index).reply_count > 0){ getGraphApiComments(CommentID, comment_index, post_index, counter1, false); }
+
+        }
+        counter1++;
+       }
     }
 
-    public static boolean getPostResponse() // getPostResponse_ClipBoard
-    {
-        return PostResponse;
 
+    public  ArrayList<Comment> getJsonComments(ArrayList<Comment> coments,GraphResponse response, String post_id ,String parent_CommentID, int isReply)
+    {
+
+        ArrayList<Comment> comments = coments;
+        JSONObject content = response.getJSONObject();
+        JSONArray data =  content.optJSONArray("data");
+
+        for(int i = 0 ; i < data.length() ; i++)
+        {
+            JSONObject obj = data.optJSONObject(i);
+            JSONObject  from = obj.optJSONObject("from");
+            JSONObject  replies = obj.optJSONObject("comments");
+            Comment comment = new Comment();
+            if(replies!=null)
+            if(replies.has("summary")) {comment.reply_count = replies.optJSONObject("summary").optInt("total_count");}
+
+            if(isReply == 1){ comment.setComment(obj.optString("id"),parent_CommentID , from.optString("name"),post_id ,from.optString("id") , obj.optString("message"), 0 ); }
+            else { comment.setComment(obj.optString("id"),parent_CommentID , from.optString("name"),post_id ,from.optString("id") , obj.optString("message"),comment.reply_count ); }
+
+            if(!friendsIds.contains(comment.user_id)&&(!comment.user_id.equals(userId))&&(!FacebookUtil.BlockedUsersIds.contains(comment.user_id)))
+            {
+              friendsIds.add(comment.user_id);
+              User user = new User();
+              if(from.has("picture")) { user.profile_pic = from.optJSONObject("picture").optJSONObject("data").optString("url"); }
+              user.setUserInformation(comment.user_id,comment.name,user.profile_pic,"https://www.facebook.com/"+comment.user_id,"UnBlocked");
+              users.add(user);
+            }
+            if(isReply == 1) { comment.parent_comment_id = parent_CommentID; }
+            comments.add(comment);
+        }
+            return comments;
     }
 
 
+    public void getGraphApiComments(final String ID , final int comment_index,final int post_index , final int counter,final boolean isComment)
+    {
+        final String[] afterString = {""};  // will contain the next page cursor
+        final Boolean[] noData = {false};   // stop when there is no after cursor
+
+        do {
+                Bundle params = new Bundle();
+                params.putString("after", afterString[0]);
+                params.putString("fields", "id,comments.summary(true),message,from{id,name,picture},likes");
+
+                GraphRequest gr = new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + ID + "/comments",
+                params,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                public void onCompleted(GraphResponse response) {
+                if (response.getError() == null) {
+                JSONObject jsonObject = response.getJSONObject();
+                //  your code
+                if(isComment == true) {
+                if (Posts.get(post_index).Comments == null) { Posts.get(post_index).Comments = new ArrayList<Comment>(); }
+                 Posts.get(post_index).Comments = getJsonComments(Posts.get(post_index).Comments, response, Posts.get(post_index).id, "", 0);
+                }
+                else {comments.get(comment_index).replies = getJsonComments(comments.get(comment_index).replies,response, Posts.get(post_index).id, ID, 1);}
 
 
+                if (!jsonObject.isNull("paging")) {
+                JSONObject paging = jsonObject.optJSONObject("paging");
+                JSONObject cursors = paging.optJSONObject("cursors");
+                if (!cursors.isNull("after"))
+                afterString[0] = cursors.optString("after");
+                else { noData[0] = true; }
+                }
+                else { noData[0] = true; }
+                }
+                else { noData[0] = true; }
+                }
+                });
+                gr.executeAndWait();
 
 
-
-
-
-
-
-
-
+            }while(noData[0] != true);
+    }
 }
