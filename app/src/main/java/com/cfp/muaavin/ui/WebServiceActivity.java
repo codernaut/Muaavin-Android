@@ -8,7 +8,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.cfp.muaavin.facebook.FacebookUtil;
 import com.cfp.muaavin.facebook.UserInterface;
-import com.cfp.muaavin.facebook.Friend;
 import com.cfp.muaavin.facebook.Higlights_CustomAdapter;
 import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.web.User;
@@ -21,8 +20,8 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
     public Context context;
     TextView jsonParsed;
     TextView uiUpdate;
-    ArrayList<Friend> infringing_friends;
-    User user = User.getUserInformation();
+    ArrayList<User> infringing_friends;
+    User user = User.getLoggedInUserInformation();
 
 
     ListView lv;
@@ -44,7 +43,6 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
 
         if (check == 0)
         {
-
             getInfringingUserAndPostData();
         }
         else
@@ -52,7 +50,7 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
             String serverURL = null;
             try
             {
-                serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)             +"&user_id="+AesEncryption.encrypt(user.id)+"&specificUserFriends="+true;
+                serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt                           (Group_name)+"&user_id="+AesEncryption.encrypt(user.id)+"&specificUserFriends="+true;
             } catch (Exception e) { e.printStackTrace(); }
 
             new WebHttpGetReq(context,WebServiceActivity.this,  check, null, this).execute(serverURL);
@@ -60,36 +58,23 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
     }
 
     @Override
-    public void getReportedFriends(ArrayList<Friend> Common_FriendsIds) {
+    public void getReportedFriends(ArrayList<String> Common_FriendsIds) {
 
+        infringing_friends = new ArrayList<User>();
 
-        ArrayList<String>  friendIDs = new ArrayList<String>();
-        infringing_friends = new ArrayList<Friend>();
+            for (int j = 0; j < FacebookLoginActivity.friend_list.size(); j++)
+            {
+                String friend_id = FacebookLoginActivity.friend_list.get(j).profile_pic;
 
-
-        for (int i = 0; i < Common_FriendsIds.size(); i++) {
-
-
-            String friend_id =  Common_FriendsIds.get(i).id;
-            for (int j = 0; j < FacebookLoginActivity.friend_list.size(); j++) {
-
-
-
-                if (friend_id.equals(FacebookLoginActivity.friend_list.get(j).id)&&(!friendIDs.contains(friend_id))) {
-
-                    friendIDs.add(friend_id);
-                    Friend infringingFriend = getInfringingFriend(j);
+                if (Common_FriendsIds.contains(friend_id))
+                {
+                    User infringingFriend = getInfringingFriend(j);
                     infringing_friends.add(infringingFriend);
-                    break;
                 }
-
             }
-
-        }
 
         if(check == 1)
         {
-
             if(infringing_friends.size() == 0)
             {
                 jsonParsed.setText("No record found");
@@ -131,9 +116,9 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
 
     }
 
-    public Friend  getInfringingFriend(int index)
+    public User  getInfringingFriend(int index)
     {
-        Friend infringingFriend = new Friend();
+        User infringingFriend = new User();
         infringingFriend.name = FacebookLoginActivity.friend_list.get(index).name;
         infringingFriend.profile_pic = FacebookLoginActivity.friend_list.get(index).profile_pic;
         infringingFriend.profile_url = FacebookLoginActivity.friend_list.get(index).profile_url;

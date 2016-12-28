@@ -11,7 +11,7 @@ public class Post implements Serializable {
    public  String image;
    public String post_url;
    public int comment_count = 0;
-   public ArrayList<Comment> Comments /*= new ArrayList<Comment>()*/;
+   public ArrayList<Comment> Comments = new ArrayList<Comment>();
 
    public Post()
    {

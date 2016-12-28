@@ -6,9 +6,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.cfp.muaavin.facebook.Friend;
-import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.web.User;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -27,7 +24,7 @@ public class FacebookLoginActivity extends ActionBarActivity  {
 
         public Context context;
         String user_id;
-        public static ArrayList<Friend> friend_list = new ArrayList<Friend>();
+        public static ArrayList<User> friend_list = new ArrayList<User>();
         public static User user = new User();
 
 

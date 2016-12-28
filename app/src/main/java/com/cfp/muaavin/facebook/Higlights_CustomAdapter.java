@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.ui.WebServiceActivity;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
+import com.cfp.muaavin.web.User;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  */
 public class Higlights_CustomAdapter extends BaseAdapter {
 
-    ArrayList<Friend> infringing_friends;
+    ArrayList<User> infringing_friends;
 
 
 
@@ -33,7 +34,7 @@ public class Higlights_CustomAdapter extends BaseAdapter {
 
 
 
-    public Higlights_CustomAdapter(WebServiceActivity webActivity,  ArrayList<Friend> infringing_friends) {
+    public Higlights_CustomAdapter(WebServiceActivity webActivity,  ArrayList<User> infringing_friends) {
 
 
         context = webActivity;

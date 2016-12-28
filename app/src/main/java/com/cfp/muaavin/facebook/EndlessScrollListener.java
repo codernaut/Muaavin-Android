@@ -38,7 +38,7 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener, Asyn
         if (!(loading) && (totalItemCount - visibleItemCount) <= (firstVisibleItem)) {
             //Log.d(TAG, "Load Next Page!");
             loading = true;
-            user = User.getUserInformation();
+            user = User.getLoggedInUserInformation();
             boolean isClipboardData = false;
             if (LoadPostsAyscncTask.nextResultsRequests != null)
             {

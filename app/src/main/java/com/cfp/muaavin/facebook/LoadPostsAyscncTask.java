@@ -34,7 +34,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     public static boolean PostResponse;
     public  static int count = 0;
     public static GraphRequest nextResultsRequests;
-    public ArrayList<Comment> comments;
+    public ArrayList<Comment> comments = new ArrayList<Comment>();
     public static ArrayList<String>  friendsIds = new ArrayList<String>();
     boolean isClipboardData;
 
@@ -64,12 +64,21 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
 
         facebookUtil = new FacebookUtil();
         if(!isClipboardData)
-        Posts = getAllPosts(Posts); //  Get All Posts
+        {
+            Posts = getAllPosts(Posts); //  Get All Posts
+            while ((FacebookUtil.isUserPresent == false) && (nextResultsRequests != null))
+            {
+                Posts = getAllPosts(new ArrayList<Post>());
+            }
+            FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
+        }
 
         else
         {
             Posts = new ArrayList<Post>();
             getPost(Post_ID);
+
+
         }
         FacebookUtil.users = users;
         return Posts;
@@ -88,6 +97,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         // 10205871243740520
         if(count == 0) {
             Bundle params = new Bundle();
+
             params.putString("fields", "message,full_picture,story,created_time,picture,comments.summary(true){from{id,name,picture},id,message,comments{from{id,name,picture},id,message}}");//,comments.summary(true)
             new GraphRequest(AccessToken.getCurrentAccessToken(),
             "/me/feed",
@@ -117,6 +127,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
             }});
             nextResultsRequests.executeAndWait();
             }
+            if(lastGraphResponse!=null)
             nextResultsRequests = lastGraphResponse.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
         }
         return Posts;
@@ -153,25 +164,22 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
 
     public void getCommentsAndReplies()
     {
-      int counter1 = FacebookUtil.Posts.size() - Posts.size();
       for(int postID = 0 ;postID < Posts.size() ; postID++)
       {
         final  int post_index = postID;
-        if(Posts.get(post_index).comment_count >  0) {
-            getGraphApiComments(Posts.get(post_index).id, -1, post_index, counter1, true);
+        if(Posts.get(post_index).comment_count >  0)
+        {
+            getGraphApiComments(Posts.get(post_index).id, -1, post_index,  true);
             comments = Posts.get(post_index).Comments;
-        }else { comments = Posts.get(post_index).Comments = new ArrayList<Comment>(); }
-
-        if(FacebookUtil.Posts.get(counter1).Comments == null) { FacebookUtil.Posts.get(counter1).Comments = comments;  }
+        }
 
         for(int j = 0; j < comments.size(); j++ )
         {
-          final int comment_index = j;
-          final String CommentID = comments.get(j).comment_id;
-          if(comments.get(comment_index).reply_count > 0){ getGraphApiComments(CommentID, comment_index, post_index, counter1, false); }
-
+            final int comment_index = j;
+            final String CommentID = comments.get(j).comment_id;
+            if(comments.get(comment_index).reply_count > 0){ getGraphApiComments(CommentID, comment_index, post_index,  false); }
         }
-        counter1++;
+
        }
     }
 
@@ -210,7 +218,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     }
 
 
-    public void getGraphApiComments(final String ID , final int comment_index,final int post_index , final int counter,final boolean isComment)
+    public void getGraphApiComments(final String ID , final int comment_index,final int post_index , final boolean isComment)
     {
         final String[] afterString = {""};  // will contain the next page cursor
         final Boolean[] noData = {false};   // stop when there is no after cursor

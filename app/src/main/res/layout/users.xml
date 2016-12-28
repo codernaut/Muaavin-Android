@@ -16,12 +16,18 @@
 
 
     <ListView android:id="@+id/listView2"
-        android:layout_height="fill_parent"
+        android:layout_height="700dp"
         android:layout_width="fill_parent"
         android:layout_below="@+id/TextView1"
         />
 
 
+    <Button android:id="@+id/LoadButton"
+        android:layout_below="@+id/listView2"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:text="Load more Users"
+        android:onClick="LoadUsers"/>
 
 
 </RelativeLayout>
