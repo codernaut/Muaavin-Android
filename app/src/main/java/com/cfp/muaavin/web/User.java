@@ -26,7 +26,7 @@ public class User implements Serializable {
 
     }
 
-    public static User getUserInformation() {
+    public static User getLoggedInUserInformation() {
 
         User user = new User();
 

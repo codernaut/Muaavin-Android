@@ -139,6 +139,7 @@ public class Users_CustomAdapter extends BaseAdapter {
                         }
                     }
                 }
+                //comments.get(j).replies = new ArrayList<Comment>();
 
             }
         }

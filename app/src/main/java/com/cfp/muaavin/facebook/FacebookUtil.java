@@ -33,22 +33,9 @@ import java.util.ArrayList;
     public static ArrayList<Post> Posts = new ArrayList<Post>();
     public static ArrayList<String> PostIds = new ArrayList<String>();
     public static ArrayList<String> PostIdsSpecific = new ArrayList<String>();
+    public static boolean isUserPresent = false; // is Any user found in currently retrievd posts
 
 
-
-    public static ArrayList<Friend> getFriends(ArrayList<User> users) {
-
-
-        ArrayList<Friend> friend_list = new ArrayList<Friend>();
-        for (int j = 0; j <= 20; j++) {
-
-            Friend friend = initializeFriend(j, users);
-            friend_list.add(friend);
-        }
-        FacebookLoginActivity.friend_list = friend_list;
-        return friend_list;
-
-    }
 
     public ArrayList<Post> getJsonDataPosts(GraphResponse response, ArrayList<Post> User_Posts) {
 
@@ -65,13 +52,6 @@ import java.util.ArrayList;
             int check = 0;
             Post post =  getPost( subdata , check);
             if(!PostIdsSpecific.contains(post.id)) { PostIdsSpecific.add(post.id) ; User_Posts.add(post); }
-
-
-
-            if((!post.message.equals("") || !post.image.equals("")))
-            {
-                //User_Posts.add(post);
-            }
         }
         return this.User_Posts;
     }
@@ -98,26 +78,9 @@ import java.util.ArrayList;
         PostDetailObj.post_image = jsonChildNode.optString("Post_Image");
         PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic");
         PostDetailObj.unlike_value = jsonChildNode.optInt("unlike_value");
-
-
         return PostDetailObj;
 
-
     }
-
-    public static Friend initializeFriend(int index ,ArrayList<User> users ) {
-
-        Friend friend = new Friend();
-        friend.name = users.get(index).name;
-        friend.id = users.get(index).id;
-        friend.profile_pic = users.get(index).profile_pic;
-        friend.profile_url = "https://www.facebook.com/" + users.get(index).id;
-
-
-        return friend;
-
-    }
-
 
 
     public ArrayList<User> getUsers() {
@@ -204,16 +167,13 @@ import java.util.ArrayList;
         }
         if (check > 0)// isData Available
         {
-            if(subdata.has("comments")) { post1.comment_count = subdata.optJSONObject("comments").optJSONObject("summary").optInt("total_count"); }
-          // if(( post1.comment_count = subdata.optJSONObject("summary").optInt("total_count")) > 0){
-          // if( subdata.has("comments")){ post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>()); }}
-            Post post2 = new Post();
-            post2 = post2.setPost(post1.id,post1.message,post1.image,post1.post_url , post1.comment_count);
-           if(!PostIds.contains(post1.id))
+            if(subdata.has("comments"))
             {
-                PostIds.add(post1.id); Posts.add(post2);
-                //User_Posts.add(post1);
+                post1.comment_count = subdata.optJSONObject("comments").optJSONObject("summary").optInt("total_count");
+                if(post1.comment_count > 0) isUserPresent = true;
             }
+          // if( subdata.has("comments")){ post1.Comments = getJsonComments(subdata.optJSONObject("comments"), post1.id,"", new ArrayList<Comment>()); }
+           if(!PostIds.contains(post1.id)) {  PostIds.add(post1.id); Posts.add(post1); }
         }
         return post1;
     }

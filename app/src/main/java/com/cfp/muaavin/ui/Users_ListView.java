@@ -3,12 +3,12 @@ package com.cfp.muaavin.ui;
 import android.content.Context;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
 
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.EndlessScrollListener;
 import com.cfp.muaavin.facebook.FacebookUtil;
-import com.cfp.muaavin.facebook.Friend;
 import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.Users_CustomAdapter;
@@ -39,9 +39,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
 
 
         isClipboardData = false;
-        //FacebookUtil.users = new ArrayList<User>();
-        //FacebookUtil.friendsIds = new ArrayList<String>();
-        //LoadPostsAyscncTask.count = 0; // if Paging Completed then set count = 0;
+        FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
         if(FacebookUtil.users.size() > 0) { getUserAndPostData(new ArrayList<Post>()); }
         else new LoadPostsAyscncTask(context, Users_ListView.this, User_SignedIn_id, isClipboardData,"",User_posts, new ArrayList<User>()).execute(User_posts);
 
@@ -57,10 +55,17 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
         ///////////
         Unique_users = FacebookUtil.users;
         ///////////
-        FacebookUtil.getFriends(Unique_users);
+        //FacebookUtil.getFriends(Unique_users);
         ListView lv=(ListView) findViewById(R.id.listView2);
         Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, FacebookUtil.Posts, User_SignedIn_id,Unique_users);
         lv.setAdapter(c);
-        lv.setOnScrollListener(new EndlessScrollListener(Users_ListView.this, User_posts, Unique_users, lv));
+        //lv.setOnScrollListener(new EndlessScrollListener(Users_ListView.this, User_posts, Unique_users, lv));
+    }
+
+    public void LoadUsers(View view)
+    {
+        FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
+        if (LoadPostsAyscncTask.nextResultsRequests != null)
+        new LoadPostsAyscncTask(context, Users_ListView.this, User_SignedIn_id, isClipboardData,"",new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
     }
 }

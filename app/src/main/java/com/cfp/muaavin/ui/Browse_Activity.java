@@ -12,8 +12,6 @@ import android.widget.TextView;
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.AsyncResponsePostsDet;
 import com.cfp.muaavin.facebook.Browser_CustomAdapter;
-import com.cfp.muaavin.facebook.Friend;
-import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.PostDetail;
 import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.web.WebHttpGetReq;

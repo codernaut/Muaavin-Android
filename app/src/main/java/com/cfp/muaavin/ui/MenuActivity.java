@@ -1,17 +1,14 @@
 package com.cfp.muaavin.ui;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.View;
-import com.cfp.muaavin.facebook.AsyncResponseComments;
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.FacebookUtil;
-import com.cfp.muaavin.facebook.Friend;
+
+import com.cfp.muaavin.facebook.FriendsAsynchronousLoad;
 import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.UserInterface;
@@ -47,11 +44,10 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         friend_management = new FriendManagement();
         user_id = getIntent().getStringExtra("User_signedID");
 
-        String serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUser?user_id="+user_id;
-        //new WebHttpGetReq(contex, 5,null, this).execute(serverURL);
-        serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
-        //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
-        ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
+        String serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
+        new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
+        //new CommentsAsynchronousTask(  contex ,1 , 1, "23432", 1).execute(new ArrayList<Post>());
+        new FriendsAsynchronousLoad(contex).execute();
 
 
     }
@@ -87,16 +83,16 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     @Override
     public void getUserAndPostData(ArrayList<Post> result) {
 
-            if(LoadPostsAyscncTask.getPostResponse() == true)
-            {
-                ClipBoard_Posts = result; // Get Asynchronous Posts Result
-                users = LoadPostsAyscncTask.users; // Get users from Clipboard post
-                Intent intent = new Intent(contex, Post_ListView.class);
+         if(LoadPostsAyscncTask.getPostResponse() == true)
+         {
+            ClipBoard_Posts = result; // Get Asynchronous Posts Result
+            users = LoadPostsAyscncTask.users; // Get users from Clipboard post
+            Intent intent = new Intent(contex, Post_ListView.class);
                 intent.putExtra("user_posts", ClipBoard_Posts);  //User_id
                 intent.putExtra("User_id", user_id);
                 intent.putExtra("ClipBoardOption", true);
                 contex.startActivity(intent);
-            }
+         }
 
             else { DialogBox.showErrorDialog(contex); }
 
@@ -104,7 +100,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
 
 
     @Override
-    public void getReportedFriends(ArrayList<Friend> Friends) {
+    public void getReportedFriends(ArrayList<String> Friends) {
 
     }
 
@@ -112,6 +108,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     public void getBlockedUsers(ArrayList<String> BlockedUserIds) {
 
         FacebookUtil.BlockedUsersIds = BlockedUserIds;
+        if(BlockedUserIds.contains(user_id)) { User.user_authentication = false;  } else { User.user_authentication = true; }
         ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
 
     }

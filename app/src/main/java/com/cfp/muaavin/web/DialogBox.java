@@ -8,13 +8,10 @@ import android.content.DialogInterface;
 
     import com.cfp.muaavin.facebook.AsyncResponsePosts;
     import com.cfp.muaavin.facebook.FacebookUtil;
-    import com.cfp.muaavin.facebook.Friend;
     import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
     import com.cfp.muaavin.facebook.Post;
     import com.cfp.muaavin.ui.BrowsePost_ListView;
     import com.cfp.muaavin.ui.Browse_Activity;
-    import com.cfp.muaavin.ui.MenuActivity;
-    import com.cfp.muaavin.ui.Post_ListView;
     import com.cfp.muaavin.ui.WebServiceActivity;
 
     import java.util.ArrayList;

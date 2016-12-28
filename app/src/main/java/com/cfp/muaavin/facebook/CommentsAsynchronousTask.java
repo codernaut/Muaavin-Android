@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.ui.MenuActivity;
 import com.cfp.muaavin.web.User;
 import com.facebook.AccessToken;
@@ -39,10 +40,10 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
     public AsyncResponseComments delegate = null;
 
 
-    public CommentsAsynchronousTask( Context contex , int index ,AsyncResponseComments delegate , int check, String user_signedin_ID, int option) {
+    public CommentsAsynchronousTask( Context contex , int index  , int check, String user_signedin_ID, int option) {
 
         this.context = contex;
-        this.delegate = delegate;
+        //this.delegate = delegate;
         this.check = check;
         user_id = user_signedin_ID;
 
@@ -68,7 +69,8 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
 
        // getCommentsAndReplies();
        // getProfilePics();
-        getIndividualPost("10205871243740520_10203936050721904"/*"1678113695797841"*/);
+       // getIndividualPost("10205871243740520_10203936050721904"/*"1678113695797841"*/);
+        getFriends();
 
         return Posts ;
     }
@@ -84,7 +86,7 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
         }
 
         MenuActivity.check = check;
-        delegate.getAllComments(result);
+        //delegate.getAllComments(result);
     }
 
     public  ArrayList<Comment> getJsonComments(GraphResponse response, String post_id ,String parent_CommentID, int isReply)
@@ -313,6 +315,32 @@ public class CommentsAsynchronousTask extends AsyncTask<ArrayList<Post> , Void, 
         gr.executeAndWait();
 
 
+    }
+
+    public void getFriends()
+    {
+
+       GraphRequest gr =  new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/"+User.getLoggedInUserInformation().id+"/taggable_friends",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        /* handle the result */
+                        JSONObject jobj = response.getJSONObject();
+                        JSONArray jARR = jobj.optJSONArray("data");
+                        try {
+                            String id = AesEncryption.decrypt(jARR.optJSONObject(0).optString("id"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+        );
+
+        gr.executeAndWait();
     }
 
 

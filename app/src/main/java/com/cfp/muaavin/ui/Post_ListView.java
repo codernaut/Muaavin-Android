@@ -47,7 +47,7 @@ public class Post_ListView extends ActionBarActivity implements AsyncResponsePos
 
         if(LoadPostsAyscncTask.nextResultsRequests!=null)
         {
-            new LoadPostsAyscncTask(context, Post_ListView.this, User_SignedIn_id, ClipBoardOption,"",User_Posts, new ArrayList<User>()).execute(User_Posts);
+            new LoadPostsAyscncTask(context, Post_ListView.this, User_SignedIn_id, ClipBoardOption,"",new ArrayList<Post>(), new ArrayList<User>()).execute(User_Posts);
         }
     }
 
@@ -56,16 +56,12 @@ public class Post_ListView extends ActionBarActivity implements AsyncResponsePos
     public void getUserAndPostData(ArrayList<Post> result)
     {
         User_Posts = result;
-
-        for(int i = 0 ; i < User_Posts.size(); i++)
-        {
-            //if(!SelectivePosts.contains(User_Posts.get(i)))
-            SelectivePosts.add(User_Posts.get(i));
-        }
+        SelectivePosts = FacebookUtil.Posts;
         SelectivePosts = Users_CustomAdapter.getSelectivePosts(FacebookUtil.ReportPostDetail.infringing_user_id, SelectivePosts);
         Posts_CustomAdapter c = new Posts_CustomAdapter( Post_ListView.this, SelectivePosts, User_SignedIn_id,ClipBoardOption);
         lv.setAdapter(c);
         User_Posts = new ArrayList<Post>();
+
 
     }
 }
