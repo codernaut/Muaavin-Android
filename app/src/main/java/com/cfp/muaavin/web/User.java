@@ -13,7 +13,7 @@ public class User implements Serializable {
     public String id;
     public String profile_pic;
     public String profile_url;
-    public static boolean user_authentication;
+    public static boolean user_authentication = true;
     public String state;
 
    public User()
@@ -22,7 +22,7 @@ public class User implements Serializable {
 
        profile_pic = "";
        profile_url = "";
-       user_authentication = true;
+
 
     }
 

@@ -45,8 +45,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         user_id = getIntent().getStringExtra("User_signedID");
 
         String serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
-        new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
-        //new CommentsAsynchronousTask(  contex ,1 , 1, "23432", 1).execute(new ArrayList<Post>());
+        //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
         new FriendsAsynchronousLoad(contex).execute();
 
 
@@ -56,6 +55,12 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     {
         if(User.user_authentication == false) { return; }
         friend_management.reportFriends(users_comments, contex, User_Posts, user_id, users_comments);
+    }
+
+    public void reportTwitter(View view)
+    {
+        Intent intent = new Intent(MenuActivity.this,TwitterLoginActivity.class);
+        startActivity(intent);
     }
 
     public void Highlights(View v)

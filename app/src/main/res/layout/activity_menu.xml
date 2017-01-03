@@ -36,9 +36,8 @@
         android:layout_height="wrap_content"
         android:text="Report"
         android:id="@+id/Reporting"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="20dp"
         android:width="200dp"
-
         android:onClick="Reporting"
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true" />
@@ -46,12 +45,22 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Report Twitter"
+        android:id="@+id/ReportTwitter"
+        android:onClick="reportTwitter"
+        android:layout_below="@+id/Reporting"
+        android:layout_centerHorizontal="true"
+        android:width="200dp"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Highlight"
         android:id="@+id/Highlight"
         android:onClick="Highlights"
-        android:layout_below="@+id/Reporting"
+        android:layout_below="@+id/ReportTwitter"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
         android:width="200dp"
         />
 
@@ -62,7 +71,6 @@
         android:id="@+id/browse"
         android:layout_below="@+id/Highlight"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
         android:width="200dp"
         android:onClick="Browse"
          />
@@ -74,7 +82,6 @@
         android:id="@+id/browsePost"
         android:layout_below="@+id/browse"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
         android:width="200dp"
         android:onClick="BrowsePost"
         />
