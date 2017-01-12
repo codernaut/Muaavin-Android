@@ -114,7 +114,7 @@ public class Posts_CustomAdapter extends BaseAdapter {
 
                 if(ClipBoardOption) getInfringingUserDetail(position);
 
-                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID);
+                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,false);
                 }
             });
 

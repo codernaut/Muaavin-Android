@@ -90,7 +90,7 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
 
                 String serverURL = null;
                 try {
-                    serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) + "&isPostOfSpecificUser=" + true;
+                    serverURL = "http://169.254.68.1.5:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) + "&isPostOfSpecificUser=" + true;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

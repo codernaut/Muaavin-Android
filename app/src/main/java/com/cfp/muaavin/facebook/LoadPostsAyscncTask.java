@@ -77,8 +77,6 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         {
             Posts = new ArrayList<Post>();
             getPost(Post_ID);
-
-
         }
         FacebookUtil.users = users;
         return Posts;
@@ -114,7 +112,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
             nextResultsRequests = lastGraphResponse.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
             count = count + 1;
         }
-        else if(count > 0)/*while (nextResultsRequests!=null)*/
+        else if(count > 0)
         {
             if (nextResultsRequests != null)
             {
@@ -134,7 +132,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
 
     }
 
-    public void getPost(final String post_id)// get Single post
+    public void getPost(final String post_id)// get Single post (Clipboard Post)
     {
 
         Bundle params = new Bundle();

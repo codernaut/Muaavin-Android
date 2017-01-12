@@ -150,7 +150,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
                     String comment = holder.edit_text.getText().toString();
                     String serverURL = null;
                     try {
-                        serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(FacebookLoginActivity.user.id) + "&post_id=" + /*Post_Details.get(0).post_id*/AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment);
+                        serverURL = "http://192.168.1.5:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(FacebookLoginActivity.user.id) + "&post_id=" + /*Post_Details.get(0).post_id*/AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -176,7 +176,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
 
                 String serverURL = null;
                 try {
-                    serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(FacebookLoginActivity.user.id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id);
+                    serverURL = "http://192.168.1.5:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(FacebookLoginActivity.user.id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -227,7 +227,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
     {
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        params.setMargins(50, 0, 20, 20);
+        params.setMargins(100, 0, 20, 20);
 
         return params;
 
@@ -247,7 +247,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
     public RelativeLayout.LayoutParams getRelativeLayoutParams()
     {
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 
         return params;

@@ -26,6 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
@@ -85,10 +86,14 @@
             android:label="@string/title_activity_browse_post__list_view" />
         <activity android:name=".TwitterLoginActivity">
 
+
         </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="b926a49ecce8cbbc50f2c038a5b7a3bfb97981a7" />
+
+        <activity android:name=".Tweet_ListView"></activity>
     </application>
 
 </manifest>

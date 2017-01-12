@@ -1,11 +1,14 @@
 package com.cfp.muaavin.facebook;
 
+import com.cfp.muaavin.web.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 
 public class Post implements Serializable {
 
+   public User PostOwner = new User();
    public  String id ;
    public  String message;
    public  String image;

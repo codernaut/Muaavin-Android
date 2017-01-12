@@ -36,17 +36,18 @@ public class Users_CustomAdapter extends BaseAdapter {
     ArrayList<User> result;
     ArrayList<Post> User_selective_posts = new ArrayList<Post>();
     ArrayList<Post> User_posts;
+    boolean IsTwitterData;
 
     Context context;
     private static LayoutInflater inflater=null;
-    public String user_signed_inID;
 
-    public Users_CustomAdapter(Context users_viewActivity,  ArrayList<Post> user_posts, String user_signed_id, ArrayList<User> unique_users) {
+
+    public Users_CustomAdapter(Context users_viewActivity,  ArrayList<Post> user_posts, ArrayList<User> unique_users, boolean isTwitterData) {
 
         result=unique_users;
         context = users_viewActivity;
-        user_signed_inID =  user_signed_id;
         User_posts = user_posts;
+        IsTwitterData = isTwitterData;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -83,7 +84,7 @@ public class Users_CustomAdapter extends BaseAdapter {
             public void onClick(View v) {
                 try
                 {
-                    FacebookUtil.ReportPostDetail.setUserInformation(result.get(position).id,result.get(position).name, UrlHelper.getEncodedUrl(result.get(position).profile_pic),"UnBlocked");
+                  FacebookUtil.ReportPostDetail.setUserInformation(result.get(position).id,result.get(position).name, UrlHelper.getEncodedUrl(result.get(position).profile_pic),"UnBlocked");
                 } catch (Exception e) {  e.printStackTrace(); }
 
                 User_selective_posts = getSelectivePosts(result.get(position).id, User_posts );
@@ -91,8 +92,9 @@ public class Users_CustomAdapter extends BaseAdapter {
                 boolean ClipBoardOption = false;
                 Intent intent = new Intent(context, Post_ListView.class);
                 intent.putExtra("user_posts",User_selective_posts);  //User_id
-                intent.putExtra("User_id", user_signed_inID);
+                intent.putExtra("User_id", User.getLoggedInUserInformation().id);
                 intent.putExtra("ClipBoardOption", ClipBoardOption);
+                intent.putExtra("isTwitterData", IsTwitterData);
                 context.startActivity(intent);
 
             }

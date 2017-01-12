@@ -1,17 +1,11 @@
 package com.cfp.muaavin.twitter;
-import com.google.gson.annotations.SerializedName;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
+
 import com.twitter.sdk.android.core.TwitterApiClient;
-import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 
-
-
 /**
- *
+ * Created by Tooba Saeed on 07/01/2017.
  */
-
 
 public class MyTwitterApiClient extends TwitterApiClient {
 
@@ -22,9 +16,4 @@ public class MyTwitterApiClient extends TwitterApiClient {
     public CustomService getCustomService() {
         return getService(CustomService.class);
     }
-
 }
-
-// example users/show service endpoint
-
-

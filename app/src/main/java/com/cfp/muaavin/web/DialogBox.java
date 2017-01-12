@@ -10,6 +10,7 @@ import android.content.DialogInterface;
     import com.cfp.muaavin.facebook.FacebookUtil;
     import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
     import com.cfp.muaavin.facebook.Post;
+    import com.cfp.muaavin.twitter.TwitterUtil;
     import com.cfp.muaavin.ui.BrowsePost_ListView;
     import com.cfp.muaavin.ui.Browse_Activity;
     import com.cfp.muaavin.ui.WebServiceActivity;
@@ -20,7 +21,7 @@ import android.content.DialogInterface;
 
 
 
-    public static void ShowDialogBOx3( final Context context , String str ,final String[] group, final int option , final String user_id)
+    public static void ShowDialogBOx3(final Context context , String str , final String[] group, final int option , final String user_id , final boolean isTwitterData)
     {
 
 
@@ -33,34 +34,54 @@ import android.content.DialogInterface;
 
 
                 String group_name = group[which];
-                FacebookUtil.ReportPostDetail.group_id = which + 1;
+                if(isTwitterData)
+                {
+                    TwitterUtil.ReportTwitterDetail.group_id = which + 1;
 
-                if (option == 0) {
-                    Intent intent = new Intent(context, WebServiceActivity.class);
-                    intent.putExtra("Group_name", group_name);
-                    intent.putExtra("check", option);
-                    context.startActivity(intent);
-                } else if (option == 1) {
+                    if(option == 7)
+                    {
+                        Intent intent = new Intent(context, WebServiceActivity.class);
+                        intent.putExtra("Group_name", group_name);
+                        intent.putExtra("check", option);
+                        context.startActivity(intent);
+                    }
+                    else
+                    {
 
-                    Intent intent = new Intent(context, WebServiceActivity.class);
-                    intent.putExtra("Group_name", group_name);
-                    intent.putExtra("check", option);
-                    context.startActivity(intent);
+                        Intent intent = new Intent(context, WebServiceActivity.class);
+                        intent.putExtra("Group_name", group_name);
+                        intent.putExtra("check", 5);
+                        context.startActivity(intent);
+                    }
+                }
+                else {
+                    FacebookUtil.ReportPostDetail.group_id = which + 1;
 
-                } else if (option == 2) {
-                    Intent intent = new Intent(context, Browse_Activity.class);
-                    intent.putExtra("Group_name", group_name);
-                    context.startActivity(intent);
-                } else if (option == 4) {
+                    if (option == 0) {
+                        Intent intent = new Intent(context, WebServiceActivity.class);
+                        intent.putExtra("Group_name", group_name);
+                        intent.putExtra("check", option);
+                        context.startActivity(intent);
+                    } else if (option == 1) {
 
-                    Intent intent = new Intent(context, BrowsePost_ListView.class);
-                    intent.putExtra("Group_name", group_name);
-                    intent.putExtra("user_id", user_id);
-                    context.startActivity(intent);
+                        Intent intent = new Intent(context, WebServiceActivity.class);
+                        intent.putExtra("Group_name", group_name);
+                        intent.putExtra("check", option);
+                        context.startActivity(intent);
+
+                    } else if (option == 2) {
+                        Intent intent = new Intent(context, Browse_Activity.class);
+                        intent.putExtra("Group_name", group_name);
+                        context.startActivity(intent);
+                    } else if (option == 4) {
+
+                        Intent intent = new Intent(context, BrowsePost_ListView.class);
+                        intent.putExtra("Group_name", group_name);
+                        intent.putExtra("user_id", user_id);
+                        context.startActivity(intent);
+                    }
 
                 }
-
-
             }
         });
         builder.show();
