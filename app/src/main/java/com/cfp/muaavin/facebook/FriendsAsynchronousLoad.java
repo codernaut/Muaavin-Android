@@ -66,6 +66,7 @@ public class FriendsAsynchronousLoad extends AsyncTask<ArrayList<User> , Void, A
          new GraphRequest.Callback() {
          public void onCompleted(GraphResponse response) {
          /* handle the result */
+         if(response.getError()==null)
          getJsonFriends(response);
          }});
          gr.executeAndWait();

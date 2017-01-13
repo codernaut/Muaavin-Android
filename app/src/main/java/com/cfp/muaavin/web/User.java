@@ -2,6 +2,9 @@ package com.cfp.muaavin.web;
 
 import com.facebook.AccessToken;
 import com.facebook.Profile;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Session;
+import com.twitter.sdk.android.core.TwitterSession;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +16,7 @@ public class User implements Serializable {
     public String id;
     public String profile_pic;
     public String profile_url;
-    public static boolean user_authentication;
+    public static boolean user_authentication = true;
     public String state;
 
    public User()
@@ -22,7 +25,7 @@ public class User implements Serializable {
 
        profile_pic = "";
        profile_url = "";
-       user_authentication = true;
+
 
     }
 
@@ -35,6 +38,17 @@ public class User implements Serializable {
         user.name = profile.getFirstName() + " " + profile.getLastName();
         user.profile_pic = (profile.getProfilePictureUri(20, 20).toString());
         user.state = "UnBlocked";
+        return user;
+
+    }
+    public static User getTwitterUserLoggedInInformation() {
+
+        User user = new User();
+        TwitterSession session = Twitter.getSessionManager().getActiveSession();
+        user.id = String.valueOf(session.getUserId());
+        user.name = String.valueOf(session.getUserName());
+        user.state = "unBlocked";
+        user.profile_pic = "fyfhgh";
         return user;
 
     }

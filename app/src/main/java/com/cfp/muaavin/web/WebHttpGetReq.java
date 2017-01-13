@@ -140,11 +140,11 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
        try
        {   Content = AesEncryption.decrypt(Content);
 
-           if(check == 0 ){
+           if((check == 0 ) || (check == 5)){
             uiUpdate = (TextView) activity.findViewById(R.id.output);
             uiUpdate.setText(Content); return;
            }
-           else if ((check == 1)||(check == 9)) { getInfringingUsersDataFromDB(Content); }
+           else if((check == 1)||(check == 9) ||(check == 7)){ getInfringingUsersDataFromDB(Content); } // check = 7 // Twitter data
 
            else if(check == 2) { getReportedPostDetailFromDB( Content); }
 
@@ -183,10 +183,10 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             JSONObject jsonChildNode = jsonArray.optJSONObject(i);
             friend.setUserInformation(jsonChildNode.optString("User_ID"),jsonChildNode.optString("User_Name"),jsonChildNode.optString("Profile_Pic"),"","unBlocked");
             BlockedUserIds.add(jsonChildNode.optString("User_ID"));
-            FrendIds.add(UrlHelper.getDecodedUrl(friend.profile_pic));
+            FrendIds.add(/*UrlHelper.getDecodedUrl(friend.profile_pic)*/friend.id);
         }
-        if(check == 1) { UserInterfaceDelegate.getReportedFriends(FrendIds); }
-        else if(check == 9){  UserInterfaceDelegate.getBlockedUsers(BlockedUserIds); }
+        if((check == 1)||(check == 7)) { UserInterfaceDelegate.getReportedFriends(FrendIds); }
+        else if((check == 9)){  UserInterfaceDelegate.getBlockedUsers(BlockedUserIds); }
     }
 
     // Get Posts From DB

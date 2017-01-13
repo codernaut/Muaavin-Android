@@ -70,7 +70,7 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener, Asyn
         ////////
         User_Posts = result;
 
-        Users_CustomAdapter c = new Users_CustomAdapter( context, /*User_Posts*/FacebookUtil.Posts, user.id,users);
+        Users_CustomAdapter c = new Users_CustomAdapter( context, /*User_Posts*/FacebookUtil.Posts, users, false);
         user_listView.setAdapter(c);
         loading = false;
 

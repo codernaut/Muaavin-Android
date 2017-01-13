@@ -39,7 +39,7 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
         user_id = intent.getStringExtra("user_id");
         String serverURL = null;
         try {
-            serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(user_id)+"&isSpecificUserPost="+true;
+            serverURL = "http://169.254.68.1.5:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(user_id)+"&isSpecificUserPost="+true;
         } catch (Exception e) {
             e.printStackTrace();
         }

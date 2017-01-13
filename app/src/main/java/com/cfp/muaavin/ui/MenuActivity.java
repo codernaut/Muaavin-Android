@@ -13,6 +13,7 @@ import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.UserInterface;
 import com.cfp.muaavin.helper.ClipBoardHelper;
+import com.cfp.muaavin.twitter.Controller;
 import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.User;
 import com.cfp.muaavin.web.FriendManagement;
@@ -20,6 +21,7 @@ import com.cfp.muaavin.web.WebHttpGetReq;
 
 import java.util.ArrayList;
 
+import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
 
 public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePosts , UserInterface {
@@ -32,6 +34,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     public static int check = 0;
     ArrayList<User> users_comments;
     public static ArrayList<User> users = new ArrayList<User>() ;
+    public String[] group = {"A","B","C","All"};
 
 
 
@@ -44,9 +47,8 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         friend_management = new FriendManagement();
         user_id = getIntent().getStringExtra("User_signedID");
 
-        String serverURL = "http://169.254.68.212:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
-        new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
-        //new CommentsAsynchronousTask(  contex ,1 , 1, "23432", 1).execute(new ArrayList<Post>());
+        String serverURL = "http://192.168.1.5:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
+        //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
         new FriendsAsynchronousLoad(contex).execute();
 
 
@@ -58,10 +60,36 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         friend_management.reportFriends(users_comments, contex, User_Posts, user_id, users_comments);
     }
 
+    public void reportTwitter(View view)
+    {
+        if(User.user_authentication == false) { return; }
+        if(session == null)
+        {
+            Intent intent = new Intent(MenuActivity.this, TwitterLoginActivity.class);
+            intent.putExtra("option", "LoadTweets");
+            startActivity(intent);
+        }
+        else { Controller controller = new Controller(contex , "LoadTweets"); }
+
+    }
+
     public void Highlights(View v)
     {
         if(User.user_authentication == false) { return; }
         friend_management.Highlights(contex);
+    }
+
+    public void highlightTwitterUsers(View view)
+    {
+        if(User.user_authentication == false) { return; }
+        if(session == null)
+        {
+            Intent intent = new Intent(MenuActivity.this, TwitterLoginActivity.class);
+            intent.putExtra("option", "LoadFollowers");
+            startActivity(intent);
+        }
+        else { Controller controller = new Controller(contex , "LoadFollowers"); }
+
     }
 
     public void Browse(View v)
@@ -91,6 +119,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
                 intent.putExtra("user_posts", ClipBoard_Posts);  //User_id
                 intent.putExtra("User_id", user_id);
                 intent.putExtra("ClipBoardOption", true);
+                intent.putExtra("isTwitterData", false);
                 contex.startActivity(intent);
          }
 
