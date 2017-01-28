@@ -7,20 +7,19 @@ import android.os.Bundle;
 import android.view.View;
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.FacebookUtil;
-
-import com.cfp.muaavin.facebook.FriendsAsynchronousLoad;
 import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.UserInterface;
 import com.cfp.muaavin.helper.ClipBoardHelper;
 import com.cfp.muaavin.twitter.Controller;
+import com.cfp.muaavin.twitter.TwitterUtil;
 import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.User;
 import com.cfp.muaavin.web.FriendManagement;
 import com.cfp.muaavin.web.WebHttpGetReq;
-
 import java.util.ArrayList;
-
+import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
+import static com.cfp.muaavin.twitter.TwitterUtil.clearTwitterData;
 import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
 
@@ -35,6 +34,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     ArrayList<User> users_comments;
     public static ArrayList<User> users = new ArrayList<User>() ;
     public String[] group = {"A","B","C","All"};
+    Controller controller;
 
 
 
@@ -43,13 +43,19 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         contex = this;
+        clearFacebookData();
+        clearTwitterData();
+        controller = new Controller(contex);
 
         friend_management = new FriendManagement();
         user_id = getIntent().getStringExtra("User_signedID");
+        //192.168.1.5  13.76.175.64
+        String serverURL = null;
+        serverURL = "http://192.168.1.9:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
 
-        String serverURL = "http://192.168.1.5:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
+
         //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
-        new FriendsAsynchronousLoad(contex).execute();
+        //new FriendsAsynchronousLoad(contex).execute();
 
 
     }
@@ -66,10 +72,9 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         if(session == null)
         {
             Intent intent = new Intent(MenuActivity.this, TwitterLoginActivity.class);
-            intent.putExtra("option", "LoadTweets");
-            startActivity(intent);
+            intent.putExtra("option", "LoadTweets"); startActivity(intent);
         }
-        else { Controller controller = new Controller(contex , "LoadTweets"); }
+        else {  controller.loadTwitterData( "LoadTweets"); }
 
     }
 
@@ -85,10 +90,9 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         if(session == null)
         {
             Intent intent = new Intent(MenuActivity.this, TwitterLoginActivity.class);
-            intent.putExtra("option", "LoadFollowers");
-            startActivity(intent);
+            intent.putExtra("option", "LoadFollowers"); startActivity(intent);
         }
-        else { Controller controller = new Controller(contex , "LoadFollowers"); }
+        else { controller.loadTwitterData( "LoadFollowers"); }
 
     }
 
@@ -116,11 +120,11 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
             ClipBoard_Posts = result; // Get Asynchronous Posts Result
             users = LoadPostsAyscncTask.users; // Get users from Clipboard post
             Intent intent = new Intent(contex, Post_ListView.class);
-                intent.putExtra("user_posts", ClipBoard_Posts);  //User_id
-                intent.putExtra("User_id", user_id);
-                intent.putExtra("ClipBoardOption", true);
-                intent.putExtra("isTwitterData", false);
-                contex.startActivity(intent);
+            intent.putExtra("user_posts", ClipBoard_Posts);  //User_id
+            intent.putExtra("User_id", user_id);
+            intent.putExtra("ClipBoardOption", true);
+            intent.putExtra("isTwitterData", false);
+            contex.startActivity(intent);
          }
 
             else { DialogBox.showErrorDialog(contex); }
@@ -134,10 +138,11 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     }
 
     @Override
-    public void getBlockedUsers(ArrayList<String> BlockedUserIds) {
+    public void getBlockedUsers(ArrayList<String> FacebookBlockedUserIds, ArrayList<String> TwitterBlockedUserIds) {
 
-        FacebookUtil.BlockedUsersIds = BlockedUserIds;
-        if(BlockedUserIds.contains(user_id)) { User.user_authentication = false;  } else { User.user_authentication = true; }
+        FacebookUtil.BlockedUsersIds = FacebookBlockedUserIds;
+        TwitterUtil.BlockedUserIds = TwitterBlockedUserIds;
+        if(FacebookBlockedUserIds.contains(user_id)) { User.user_authentication = false;  } else { User.user_authentication = true; }
         ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
 
     }

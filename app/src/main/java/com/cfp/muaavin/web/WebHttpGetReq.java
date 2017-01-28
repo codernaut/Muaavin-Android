@@ -142,7 +142,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
            if((check == 0 ) || (check == 5)){
             uiUpdate = (TextView) activity.findViewById(R.id.output);
-            uiUpdate.setText(Content); return;
+            uiUpdate.setText(Content);  return;
            }
            else if((check == 1)||(check == 9) ||(check == 7)){ getInfringingUsersDataFromDB(Content); } // check = 7 // Twitter data
 
@@ -174,7 +174,8 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
     // Get Infringing Users Data From DB
     public void getInfringingUsersDataFromDB(String Content) throws JSONException
     {
-        ArrayList<String> BlockedUserIds = new ArrayList<String>();
+        ArrayList<String> FacebookBlockedUserIds = new ArrayList<String>();
+        ArrayList<String> TwitterBlockedUserIds = new ArrayList<String>();
         JSONArray jsonArray = new JSONArray(Content);
         ArrayList<String> FrendIds = new ArrayList<String>();
         for (int i = 0; i < jsonArray.length(); i++)
@@ -182,11 +183,13 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             User friend = new User();
             JSONObject jsonChildNode = jsonArray.optJSONObject(i);
             friend.setUserInformation(jsonChildNode.optString("User_ID"),jsonChildNode.optString("User_Name"),jsonChildNode.optString("Profile_Pic"),"","unBlocked");
-            BlockedUserIds.add(jsonChildNode.optString("User_ID"));
+            if(jsonChildNode.optBoolean("IsTwitterUser"))
+            { TwitterBlockedUserIds.add(jsonChildNode.optString("User_ID")); }
+            else { FacebookBlockedUserIds.add(jsonChildNode.optString("User_ID")); }
             FrendIds.add(/*UrlHelper.getDecodedUrl(friend.profile_pic)*/friend.id);
         }
         if((check == 1)||(check == 7)) { UserInterfaceDelegate.getReportedFriends(FrendIds); }
-        else if((check == 9)){  UserInterfaceDelegate.getBlockedUsers(BlockedUserIds); }
+        else if((check == 9)){  UserInterfaceDelegate.getBlockedUsers(FacebookBlockedUserIds , TwitterBlockedUserIds); }
     }
 
     // Get Posts From DB
@@ -199,12 +202,14 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             Post post = new Post();
             JSONObject jsonChildNode = jsonArray.optJSONObject(i);
             post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/"+jsonChildNode.optString("Post_ID"),0);
+            post.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost");
+            post.IsComment = jsonChildNode.optBoolean("IsComment");
             if(!PostIDs.contains(post.id)){ PostIDs.add(post.id);  Posts.add(post); }
         }
         Postdelegate.getUserAndPostData(Posts);
     }
 
-    // Get Reports From DB
+    // Get Reports From WebService
     public void getReportedPostDetailFromDB(String Content) throws JSONException {
 
     JSONArray jsonArray = new JSONArray(Content);
@@ -217,15 +222,35 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
        PostDetail PostDetailObj = facebookUtil.getReportedPostDetail(i,jsonChildNode);
        JsonPostDetails.add(PostDetailObj);
 
+
        if(dictionary.containsKey(PostDetailObj.post_id))
        {
           ArrayList<PostDetail> reportedPostDetail = (ArrayList<PostDetail>) dictionary.get(PostDetailObj.post_id);
-          reportedPostDetail.add(PostDetailObj);
-          dictionary.put(PostDetailObj.post_id,reportedPostDetail);
+          if(PostDetailObj.IsTwitterPost)
+          {
+              if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
+              dictionary.put(PostDetailObj.post_id,reportedPostDetail);
+          }
+          else
+          {
+              if(checkIfAnObjectAlreadyPresent(reportedPostDetail , PostDetailObj ))
+              {
+                  if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
+                  dictionary.put(PostDetailObj.post_id,reportedPostDetail);
+              }
+              else
+              {
+                  //if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
+                  reportedPostDetail.add(PostDetailObj); dictionary.put(PostDetailObj.post_id,reportedPostDetail);
+              }
+          }
+          //reportedPostDetail.add(PostDetailObj);
+          //dictionary.put(PostDetailObj.post_id,reportedPostDetail);
        }
        else
        {
           ArrayList<PostDetail> PostDetailslist = new ArrayList<PostDetail>();
+          if(!PostDetailObj.FeedBackMessage.equals("")) { PostDetailObj.FeedBacks.add(PostDetailObj.FeedBackMessage); }
           PostDetailslist.add(PostDetailObj);
           dictionary.put(PostDetailObj.post_id,PostDetailslist);
        }
@@ -233,7 +258,16 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
        PostDetailDelegate.getPostsDetails(dictionary);
  }
 
-
+    public boolean checkIfAnObjectAlreadyPresent(ArrayList<PostDetail> Reports, PostDetail PostDetailObj)
+    {
+        boolean RecordPresent = false;
+        for(int i = 0 ; i < Reports.size() ; i++)
+        {
+            if ((PostDetailObj.ParentComment_ID.equals(Reports.get(i).ParentComment_ID)) && (PostDetailObj.coment_id.equals(Reports.get(i).coment_id)))
+                RecordPresent = true;
+        }
+        return RecordPresent;
+    }
 
 }
 

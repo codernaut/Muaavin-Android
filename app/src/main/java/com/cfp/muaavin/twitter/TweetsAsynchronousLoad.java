@@ -12,7 +12,7 @@ import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.services.StatusesService;
-
+import com.twitter.sdk.android.core.models.*;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +40,7 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
     Call<List<Tweet>> TweetList;
     public static long FollowersCursor = -1l;
     ResponseBody responseBody;
+    com.twitter.sdk.android.core.models.User user;
     public String option;
     public static  long maxId = 0l;//804552725816086528l 816753471089209344l;
 
@@ -56,7 +57,7 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
     @Override
     protected void onPreExecute() {
         dialog = new ProgressDialog(context);
-        dialog.setMessage("Loading Tweets, Please Wait..");
+        dialog.setMessage("Loading Data, Please Wait..");
         dialog.show();
         super.onPreExecute();
     }
@@ -66,17 +67,26 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
 
         final StatusesService service = Twitter.getInstance().getApiClient().getStatusesService();
         TwitterSession session = Twitter.getSessionManager().getActiveSession();
-        Call<ResponseBody> CallResponseBody = null;
+        Call<ResponseBody> CallResponseBody = null; Call<com.twitter.sdk.android.core.models.User>  CallUser = null;
         if(option.equals("LoadTweets"))
         {
             if(maxId == 0l) { TweetList = service.homeTimeline(null, null, null, null, null, null, null); }
 
             else {  TweetList = service.homeTimeline(null, null, maxId, null, null, null, null);}
 
-            try { TweetsResponse   =    TweetList.execute().body(); maxId =  TweetsResponse.get(TweetsResponse.size()-1).id; }
+            try { TweetsResponse   =    TweetList.execute().body(); if(TweetsResponse!=null) maxId =  TweetsResponse.get(TweetsResponse.size()-1).id; }
 
             catch (IOException e) { e.printStackTrace();}
-            Tweets =  twitterUtil.getTweets(TweetsResponse);
+            if(TweetsResponse!=null) { Tweets =  twitterUtil.getTweets(TweetsResponse); }
+
+            return Tweets;
+        }
+        else if(option.equals("LoadUser"))
+        {
+            CallUser = new MyTwitterApiClient(session).getCustomService().getLoggedInUser(session.getUserId());
+            try{  user = CallUser.execute().body();
+                  TwitterUtil.user.setUserInformation(user.idStr,user.name,user.profileImageUrl,user.profileBannerUrl,"UnBlocked");
+               } catch (IOException e) { e.printStackTrace(); }
             return Tweets;
         }
 
@@ -84,9 +94,9 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
         {
             CallResponseBody = new MyTwitterApiClient(session).getCustomService().show(session.getUserId(), FollowersCursor);
         }
+
         try{ responseBody =      CallResponseBody.execute().body();  getDataFromResponseBody(responseBody);}
         catch (IOException e) {  e.printStackTrace(); }
-
 
         return Tweets;
     }
@@ -97,7 +107,7 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
         if (dialog.isShowing()) {
             dialog.dismiss();
         }
-        TweetsDelegate.tweetsAsynchronousResponse(Tweets);
+        TweetsDelegate.tweetsAsynchronousResponse(Tweets, option);
 
     }
 
@@ -126,7 +136,7 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
                 user.name = object.optString("name");
                 user.id = object.optString("id_str");
                 user.profile_pic = object.optString("profile_image_url");
-                user.state = "unBlocked";
+                user.state = "UnBlocked";
                 users.add(user);
                 TwitterUtil.Followers.add(user);
             }

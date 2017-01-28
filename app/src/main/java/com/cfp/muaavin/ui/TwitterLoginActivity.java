@@ -30,6 +30,7 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
     Context context ;
     String option;
     public String[] group = {"A","B","C","All"};
+    public Controller controller;
 
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
@@ -46,6 +47,7 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
         setContentView(R.layout.twitter_login_screen);
         context = this;
         option = getIntent().getStringExtra("option");
+        controller = new Controller(context);
 
         loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
         loginButton.setCallback(new Callback<TwitterSession>() {
@@ -57,7 +59,7 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
 
 
                 session = Twitter.getSessionManager().getActiveSession();
-                Controller controller = new Controller(context,option);
+                //Controller controller = new Controller(context,option);
 
                 final HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
                 loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
@@ -73,9 +75,13 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
                     customApiClient = new TwitterApiClient(customClient);
                     TwitterCore.getInstance().addGuestApiClient(customApiClient);
                 }
+                //option = "LoadUser";
+                controller.loadTwitterData("LoadUser");
+                controller.loadTwitterData(option);
 
                 String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+
 
 
             }
@@ -94,10 +100,11 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
         // Make sure that the loginButton hears the result from any
         // Activity that it triggered.
         loginButton.onActivityResult(requestCode, resultCode, data);
+
     }
 
     @Override
-    public void tweetsAsynchronousResponse(ArrayList<Post> tweets)
+    public void tweetsAsynchronousResponse(ArrayList<Post> tweets, String option)
     {
         Toast.makeText(getApplicationContext(), "Tweets Successfully loaded", Toast.LENGTH_LONG).show();
         if(option.equals("LoadTweets"))
@@ -111,6 +118,7 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
         }
 
     }
+
 }
 
 

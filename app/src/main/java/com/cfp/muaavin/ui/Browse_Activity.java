@@ -38,10 +38,10 @@ public class Browse_Activity extends ActionBarActivity implements AsyncResponseP
 
         String serverURL = null;
         try {
-            serverURL = "http://192.168.1.5:8080/Muaavin-Web/rest/Posts_Query/GetPosts?name="+ AesEncryption.encrypt(Group_name);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/Posts_Query/GetPosts?name="+ AesEncryption.encrypt(Group_name);
+        } catch (Exception e) { e.printStackTrace(); }
+
+
         new WebHttpGetReq(context, Browse_Activity.this, 2,this).execute(serverURL);
 
 

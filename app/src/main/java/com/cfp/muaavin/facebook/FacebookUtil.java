@@ -68,16 +68,22 @@ import java.util.ArrayList;
     public PostDetail getReportedPostDetail(int index, JSONObject jsonChildNode) {
 
         PostDetail PostDetailObj = new PostDetail();
-        PostDetailObj.ParentComment_ID = jsonChildNode.optString("Parent_CommentID");
-        PostDetailObj.infringing_user_name = jsonChildNode.optString("infringingUser_name");
-        PostDetailObj.coment_id = jsonChildNode.optString("CommentID");
-        PostDetailObj.comment = jsonChildNode.optString("Comment");
-        PostDetailObj.post_id = jsonChildNode.optString("Post_ID");
-        PostDetailObj.PostUrl = "https://www.facebook.com/" + PostDetailObj.post_id;
-        PostDetailObj.post_Detail = jsonChildNode.optString("Post_Detail");
-        PostDetailObj.post_image = jsonChildNode.optString("Post_Image");
-        PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic");
-        PostDetailObj.unlike_value = jsonChildNode.optInt("unlike_value");
+
+        if(jsonChildNode.has("Parent_CommentID")) { PostDetailObj.ParentComment_ID = jsonChildNode.optString("Parent_CommentID"); }
+        if(jsonChildNode.has("infringingUser_name")) { PostDetailObj.infringing_user_name = jsonChildNode.optString("infringingUser_name"); }
+        if(jsonChildNode.has("infringingUserId")) { PostDetailObj.infringing_user_id = jsonChildNode.optString("infringingUserId"); }
+        if(jsonChildNode.has("CommentID")) { PostDetailObj.coment_id = jsonChildNode.optString("CommentID"); }
+        //if(jsonChildNode.has("Comment")) { PostDetailObj.comment = jsonChildNode.optString("Comment"); }
+        if(jsonChildNode.has("Post_ID")) { PostDetailObj.post_id = jsonChildNode.optString("Post_ID"); }
+        //if(jsonChildNode.has("Post_ID")) { PostDetailObj.PostUrl = "https://www.facebook.com/" + PostDetailObj.post_id; }
+        if(jsonChildNode.has("Post_Detail")) { PostDetailObj.post_Detail = jsonChildNode.optString("Post_Detail"); }
+        if(jsonChildNode.has("Post_Image")) { PostDetailObj.post_image = jsonChildNode.optString("Post_Image"); }
+        if(jsonChildNode.has("infringingUser_ProfilePic")) { PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic"); }
+        if(jsonChildNode.has("unlike_value")) { PostDetailObj.unlike_value = jsonChildNode.optInt("unlike_value"); }
+        if(jsonChildNode.has("IsTwitterPost")) { PostDetailObj.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost"); }
+        if(jsonChildNode.has("FeedBackMessage")) { PostDetailObj.FeedBackMessage = jsonChildNode.optString("FeedBackMessage"); }
+        if(jsonChildNode.has("IsComment")) { PostDetailObj.IsComment = jsonChildNode.optBoolean("IsComment"); }
+
         return PostDetailObj;
 
     }
@@ -176,6 +182,20 @@ import java.util.ArrayList;
            if(!PostIds.contains(post1.id)) {  PostIds.add(post1.id); Posts.add(post1); }
         }
         return post1;
+    }
+
+    public static  void clearFacebookData()
+    {
+        FacebookUtil.users = new ArrayList<User>();
+        FacebookUtil.Posts = new ArrayList<Post>();
+        FacebookUtil.PostIds = new ArrayList<String>();
+        FacebookUtil.friendsIds = new ArrayList<String>();
+        FacebookUtil.PostIdsSpecific = new ArrayList<String>();
+        LoadPostsAyscncTask.nextResultsRequests = null;
+        LoadPostsAyscncTask.count = 0;
+        LoadPostsAyscncTask.PostResponse = false;
+        LoadPostsAyscncTask.friendsIds = new ArrayList<String>();
+        LoadPostsAyscncTask.users = new ArrayList<User>();
     }
 
 

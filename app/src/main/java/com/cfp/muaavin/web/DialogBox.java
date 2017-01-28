@@ -57,6 +57,7 @@ import android.content.DialogInterface;
                 else {
                     FacebookUtil.ReportPostDetail.group_id = which + 1;
 
+
                     if (option == 0) {
                         Intent intent = new Intent(context, WebServiceActivity.class);
                         intent.putExtra("Group_name", group_name);

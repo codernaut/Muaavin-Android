@@ -2,6 +2,7 @@ package com.cfp.muaavin.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -40,8 +41,16 @@ public class Tweet_ListView extends Activity implements TweetsAsynchronousRespon
 
 
     @Override
-    public void tweetsAsynchronousResponse(ArrayList<Post> tweet)
+    public void tweetsAsynchronousResponse(ArrayList<Post> tweet, String option)
     {
         ((BaseAdapter) TweetListView.getAdapter()).notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 }

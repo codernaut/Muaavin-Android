@@ -15,17 +15,21 @@ import com.cfp.muaavin.facebook.Browser_CustomAdapter;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.PostDetail;
 import com.cfp.muaavin.helper.AesEncryption;
+import com.cfp.muaavin.web.User;
 import com.cfp.muaavin.web.WebHttpGetReq;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
 
 public class BrowsePost_ListView extends ActionBarActivity implements AsyncResponsePosts {
 
     Context context;
     String Group_name;
-    String user_id;
+    String user_id , TwitterUserId;
+
     ListView browsePost_Listview;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +43,11 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
         user_id = intent.getStringExtra("user_id");
         String serverURL = null;
         try {
-            serverURL = "http://169.254.68.1.5:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(user_id)+"&isSpecificUserPost="+true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            if(session==null) { TwitterUserId = "";  } else { TwitterUserId = String.valueOf(session.getUserId()); }
+            serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getLoggedInUserInformation().id)+"&isSpecificUserPost="+true+"&TwitterUserID="+AesEncryption.encrypt(TwitterUserId);
+        } catch (Exception e) { e.printStackTrace(); }
+
+
         new WebHttpGetReq(context,BrowsePost_ListView.this, 4,this,null).execute(serverURL);
 
 
@@ -54,7 +59,7 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
     public void getUserAndPostData(ArrayList<Post> result) {
 
         ArrayList<Post> Posts = new ArrayList<Post>();
-        BrowsePostCustomAdapter c = new BrowsePostCustomAdapter(BrowsePost_ListView.this, result, Group_name , user_id);
+        BrowsePostCustomAdapter c = new BrowsePostCustomAdapter(BrowsePost_ListView.this, result, Group_name , User.getLoggedInUserInformation().id);
         browsePost_Listview.setAdapter(c);
 
 

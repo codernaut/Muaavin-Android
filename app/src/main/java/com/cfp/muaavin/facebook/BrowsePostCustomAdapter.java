@@ -3,6 +3,7 @@ package com.cfp.muaavin.facebook;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 
+import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
+
 /**
  *
  */
@@ -34,7 +37,7 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
     Context context;
     private static LayoutInflater inflater=null;
     public String GroupName;
-    public final String user_id;
+    public  String user_id;
 
 
     public BrowsePostCustomAdapter(BrowsePost_ListView browsePost_activity, ArrayList<Post> posts, String group_name, String userId)
@@ -83,20 +86,25 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
         holder.post_image =  (ImageView)rowView.findViewById(R.id.Image_view);
         holder.PostTextview.setText(Posts.get(position).message);
 
+        if(Posts.get(position).IsTwitterPost)
+        {
+            holder.PostHeading.setBackgroundColor(Color.parseColor("#00BFFF"));
+            holder.PostHeading.setText("Tweet");
+        }
+
 
         holder.CrossButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 String serverURL = null;
-                try {
-                    serverURL = "http://169.254.68.1.5:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) + "&isPostOfSpecificUser=" + true;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                try
+                {
+                  if(Posts.get(position).IsTwitterPost) { user_id = String.valueOf(session.getUserId()); }
+                  serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) + "&isPostOfSpecificUser=" + true+"&IsTwitterPost="+Posts.get(position).IsTwitterPost+"&IsComment="+Posts.get(position).IsComment;
+                } catch (Exception e) { e.printStackTrace(); }
 
                 new WebHttpGetReq(context, 5, holder.PostTextview, 6).execute(serverURL);
-
 
             }
         });
