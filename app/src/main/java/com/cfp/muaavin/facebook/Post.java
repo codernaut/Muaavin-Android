@@ -15,6 +15,8 @@ public class Post implements Serializable {
    public String post_url;
    public int comment_count = 0;
    public ArrayList<Comment> Comments = new ArrayList<Comment>();
+   public boolean IsTwitterPost;
+   public boolean IsComment;
 
    public Post()
    {

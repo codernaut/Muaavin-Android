@@ -10,6 +10,6 @@ import java.util.ArrayList;
 
 public interface TweetsAsynchronousResponse {
 
-    public void tweetsAsynchronousResponse(ArrayList<Post> tweet);
+    public void tweetsAsynchronousResponse(ArrayList<Post> tweet, String option);
 
 }

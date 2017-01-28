@@ -1,11 +1,13 @@
 package com.cfp.muaavin.facebook;
 
+import java.util.ArrayList;
+
 /**
  *
  */
 public class PostDetail {
 
-    public  String ParentComment_ID;
+    public String ParentComment_ID;
     public String infringing_user_name;
     public String infringing_user_id;
     public String coment_id;
@@ -14,10 +16,16 @@ public class PostDetail {
     public String post_Detail;
     public String post_image;
     public String infringing_user_profile_pic;
+    public int infringing_user_index;
     public int unlike_value;
     public int group_id;
     public String PostUrl;
     public String user_state;
+    public String FeedBackMessage;
+    public  boolean IsTwitterPost;
+    public  boolean IsComment;
+
+    public ArrayList<String> FeedBacks = new ArrayList<String>();
 
 
 
@@ -33,6 +41,7 @@ public class PostDetail {
         infringing_user_profile_pic = "";
         infringing_user_id = "";
         PostUrl = "";
+        FeedBackMessage = "";
 
     }
 

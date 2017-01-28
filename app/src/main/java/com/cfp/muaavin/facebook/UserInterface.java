@@ -10,5 +10,5 @@ import java.util.ArrayList;
 public interface UserInterface {
 
     void getReportedFriends(ArrayList<String> Friends);
-    void getBlockedUsers(ArrayList<String> UserIds);
+    void getBlockedUsers(ArrayList<String> FacebookUserIds, ArrayList<String> TwitterUserIds);
 }

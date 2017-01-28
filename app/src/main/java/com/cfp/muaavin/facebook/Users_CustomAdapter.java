@@ -84,6 +84,7 @@ public class Users_CustomAdapter extends BaseAdapter {
             public void onClick(View v) {
                 try
                 {
+                  FacebookUtil.ReportPostDetail.infringing_user_index = position;
                   FacebookUtil.ReportPostDetail.setUserInformation(result.get(position).id,result.get(position).name, UrlHelper.getEncodedUrl(result.get(position).profile_pic),"UnBlocked");
                 } catch (Exception e) {  e.printStackTrace(); }
 

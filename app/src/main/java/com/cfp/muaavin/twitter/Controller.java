@@ -18,27 +18,42 @@ import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
 public class Controller implements TweetsAsynchronousResponse {
 
-    public String option;
     public Context context;
     public String[] group = {"A","B","C","All"};
     TweetsAsynchronousResponse TwitterAsyncDelegate = this;
 
-    public Controller(Context context, String option)
+    public Controller(Context context)
     {
-        this.option = option;
         this.context = context;
 
-        new TweetsAsynchronousLoad(context, TwitterAsyncDelegate,option).execute();
+        /*if(isTwitterUserBlocked() == false)
+        new TweetsAsynchronousLoad(context, TwitterAsyncDelegate,option).execute();*/
 
+    }
+
+    public boolean isTwitterUserBlocked()
+    {
+        if(TwitterUtil.BlockedUserIds.contains(String.valueOf(session.getUserId())))
+        {  return true; }
+        else { return false; }
+
+    }
+
+    public void loadTwitterData(String option)
+    {
+
+        if(isTwitterUserBlocked() == false)
+        new TweetsAsynchronousLoad(context, TwitterAsyncDelegate,option).execute();
     }
 
 
     @Override
-    public void tweetsAsynchronousResponse(ArrayList<Post> tweet) {
+    public void tweetsAsynchronousResponse(ArrayList<Post> tweet, String option) {
         if(option.equals("LoadTweets"))
         {
             Intent intent = new Intent(context, Tweet_ListView.class);
             context.startActivity(intent);
+            
         }
         else if(option.equals("LoadFollowers"))
         {
