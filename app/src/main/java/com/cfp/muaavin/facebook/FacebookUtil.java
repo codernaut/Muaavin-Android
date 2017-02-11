@@ -72,13 +72,13 @@ import java.util.ArrayList;
         if(jsonChildNode.has("Parent_CommentID")) { PostDetailObj.ParentComment_ID = jsonChildNode.optString("Parent_CommentID"); }
         if(jsonChildNode.has("infringingUser_name")) { PostDetailObj.infringing_user_name = jsonChildNode.optString("infringingUser_name"); }
         if(jsonChildNode.has("infringingUserId")) { PostDetailObj.infringing_user_id = jsonChildNode.optString("infringingUserId"); }
+        if(jsonChildNode.has("infringingUser_ProfilePic")) { PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic"); }
         if(jsonChildNode.has("CommentID")) { PostDetailObj.coment_id = jsonChildNode.optString("CommentID"); }
         //if(jsonChildNode.has("Comment")) { PostDetailObj.comment = jsonChildNode.optString("Comment"); }
         if(jsonChildNode.has("Post_ID")) { PostDetailObj.post_id = jsonChildNode.optString("Post_ID"); }
         //if(jsonChildNode.has("Post_ID")) { PostDetailObj.PostUrl = "https://www.facebook.com/" + PostDetailObj.post_id; }
         if(jsonChildNode.has("Post_Detail")) { PostDetailObj.post_Detail = jsonChildNode.optString("Post_Detail"); }
         if(jsonChildNode.has("Post_Image")) { PostDetailObj.post_image = jsonChildNode.optString("Post_Image"); }
-        if(jsonChildNode.has("infringingUser_ProfilePic")) { PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic"); }
         if(jsonChildNode.has("unlike_value")) { PostDetailObj.unlike_value = jsonChildNode.optInt("unlike_value"); }
         if(jsonChildNode.has("IsTwitterPost")) { PostDetailObj.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost"); }
         if(jsonChildNode.has("FeedBackMessage")) { PostDetailObj.FeedBackMessage = jsonChildNode.optString("FeedBackMessage"); }
@@ -88,6 +88,20 @@ import java.util.ArrayList;
 
     }
 
+    public static ArrayList<User> getFriends() {
+
+        FacebookLoginActivity.friend_list = new ArrayList<User>();
+        for(int i = 0 ; i < 13; i++)
+        {
+           User user = new User();
+           user.id = FacebookUtil.users.get(i).id;
+           user.name = FacebookUtil.users.get(i).name;
+           user.profile_pic = FacebookUtil.users.get(i).profile_pic;
+           user.profile_url = "https://www.facebook.com/" + user.id;
+           FacebookLoginActivity.friend_list.add(user) ;
+        }
+        return users;
+    }
 
     public ArrayList<User> getUsers() {
 
@@ -147,8 +161,10 @@ import java.util.ArrayList;
     {
 
         Post post1 = new Post();
-        if (!subdata.has("comments")) {
-           // return post1;
+        if (subdata.has("from")) {
+            post1.PostOwner.id = subdata.optJSONObject("from").optString("id");
+            post1.PostOwner.name = subdata.optJSONObject("from").optString("name");
+            post1.PostOwner.profile_pic = subdata.optJSONObject("from").optJSONObject("picture").optJSONObject("data").optString("url");
         }
         if (subdata.has("message")) {
             check = check + 1;
@@ -197,6 +213,5 @@ import java.util.ArrayList;
         LoadPostsAyscncTask.friendsIds = new ArrayList<String>();
         LoadPostsAyscncTask.users = new ArrayList<User>();
     }
-
 
 }

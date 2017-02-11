@@ -35,6 +35,7 @@ public class TwitterUtil {
     public static ArrayList<String> tweetIds = new ArrayList<String>();
     public static ArrayList<User> Followers = new ArrayList<User>();
     public static ArrayList<String> BlockedUserIds = new ArrayList<String>();
+    public static Tweet Tweet = null;
     public static User user = new User();
 
 

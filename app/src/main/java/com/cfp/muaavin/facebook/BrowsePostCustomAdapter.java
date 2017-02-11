@@ -101,7 +101,7 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
                 try
                 {
                   if(Posts.get(position).IsTwitterPost) { user_id = String.valueOf(session.getUserId()); }
-                  serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) + "&isPostOfSpecificUser=" + true+"&IsTwitterPost="+Posts.get(position).IsTwitterPost+"&IsComment="+Posts.get(position).IsComment;
+                  serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) +"&InfringingUserID="+AesEncryption.encrypt(Posts.get(position).PostOwner.id)+ "&isPostOfSpecificUser=" + true+"&IsTwitterPost="+Posts.get(position).IsTwitterPost+"&IsComment="+Posts.get(position).IsComment;
                 } catch (Exception e) { e.printStackTrace(); }
 
                 new WebHttpGetReq(context, 5, holder.PostTextview, 6).execute(serverURL);

@@ -11,25 +11,28 @@ import com.cfp.muaavin.web.DialogBox;
  *
  */
 public class ClipBoardHelper {
-
+    //https://m.facebook.com/story.php?story_fbid=10158184720635506&id=572570505
+    //https://m.facebook.com/story.php?story_fbid=10154624315373451&id=325342768450
     public static ClipboardManager clipboard;
     public static void getPostFromClipBoard(Context context, AsyncResponsePosts Postdelegate , String user_id)
     {
-
+        boolean IsFacebookPost = false;
         clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("url", "https://m.facebook.com/story.php?story_fbid=1341003545930283&substory_index=0&id=487101601320486");
+        ClipData clip = ClipData.newPlainText("url", "https://m.facebook.com/story.php?story_fbid=10154624315373451&id=325342768450");
         clipboard.setPrimaryClip(clip);
 
-        String ClipboardData = "";///
-        if(clipboard.hasPrimaryClip())
+        String ClipboardData = "";///https://twitter.com/Asad_Umar/status/828527999951761408
+        if(clipboard.hasPrimaryClip())//https://m.facebook.com/story.php?story_fbid=1341003545930283&substory_index=0&id=487101601320486
         {
-            ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+            ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);//https://m.facebook.com/story.php?story_fbid=10206185117027156&id=1841119553
             ClipboardData = String.valueOf( item.getText());
 
             if(ClipboardData!=null)
-            {
-                String post_id =  UrlHelper.getQueryFieldsFromURL( ClipboardData);
-                DialogBox.showQuestionDialog(context, Postdelegate, user_id, post_id, ClipboardData);
+            {   String post_id = "" ;
+                if(ClipboardData.contains("m.facebook.com")){ IsFacebookPost = true;  post_id =  UrlHelper.getQueryFieldsFromURL( ClipboardData); }
+                else { String[] StringArr = ClipboardData.split("/"); post_id = StringArr[StringArr.length-1]; }
+
+                DialogBox.showQuestionDialog(context, Postdelegate, user_id, post_id, ClipboardData,IsFacebookPost );
             }
         }
     }

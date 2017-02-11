@@ -55,9 +55,8 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
             try
             {
               User user = User.getLoggedInUserInformation();
-              serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(user.id)+"&specificUserFriends="+true;
+              serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(user.id)+"&specificUserFriends="+true;
             } catch (Exception e) { e.printStackTrace(); }
-
             new WebHttpGetReq(context,WebServiceActivity.this,  check, null, this).execute(serverURL);
         }
 
@@ -66,7 +65,7 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
             try
             {
               User TwitterUser =  User.getTwitterUserLoggedInInformation();
-              serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/TweetQuery/AddTweet?User_ID="+AesEncryption.encrypt(TwitterUser.id)+"&User_Name="+AesEncryption.encrypt(TwitterUser.name)+"&User_ImageUrl="+AesEncryption.encrypt("hoiu")+"&Tweet_ID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_id)+"&Message="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_Detail)+"&ImageUrl="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_image)+"&Group_Name="+AesEncryption.encrypt(Group_name)+"&InfringingUserID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_id)+"&InfringingUserName="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_name)+"&InfringingUserProfilePic="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic);
+              serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/TweetQuery/AddTweet?User_ID="+AesEncryption.encrypt(TwitterUser.id)+"&User_Name="+AesEncryption.encrypt(TwitterUser.name)+"&User_ImageUrl="+AesEncryption.encrypt("hoiu")+"&Tweet_ID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_id)+"&Message="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_Detail)+"&ImageUrl="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_image)+"&Group_Name="+AesEncryption.encrypt(Group_name)+"&InfringingUserID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_id)+"&InfringingUserName="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_name)+"&InfringingUserProfilePic="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic);
             } catch (Exception e) { e.printStackTrace(); }
             new WebHttpGetReq(context,WebServiceActivity.this,check, null, this).execute(serverURL);
         }
@@ -76,7 +75,7 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
             try
             {
               User TwitterUser =  User.getTwitterUserLoggedInInformation();
-              serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(TwitterUser.id)+"&specificUserFriends="+true+"&isTwitterData="+true;
+              serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(TwitterUser.id)+"&specificUserFriends="+true+"&isTwitterData="+true;
             } catch (Exception e) { e.printStackTrace(); }
             new WebHttpGetReq(context,WebServiceActivity.this,check, null, this).execute(serverURL);
         }
@@ -112,9 +111,6 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
                 lv.setAdapter(c);
             }
         }
-
-
-
     }
 
     @Override
@@ -127,7 +123,7 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
         try
         {
             User user = User.getLoggedInUserInformation();
-            String serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/posts/Insert_Post?user_name="+AesEncryption.encrypt(user.name)+"&UserState="+AesEncryption.encrypt(user.state)+"&ReportedUserState="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.user_state)+"&Post_id=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_id) + "&Group_id="+ AesEncryption.encrypt(String.valueOf(FacebookUtil.ReportPostDetail.group_id))+"&Comment_id="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.coment_id) + "&PComment_id="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.ParentComment_ID) + "&Group_name=" + AesEncryption.encrypt(Group_name) + "&Profile_name=" + AesEncryption.encrypt(user.id) + "&user_id=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_id) +  "&infringing user_name="+ AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_name)+"&Post_image=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_image)+"&userProfilePic="+AesEncryption.encrypt(user.profile_pic)+"&infringingUser_ProfilePic=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_profile_pic)+"&Comment="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.comment) +"&Post_Det=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_Detail) ;
+            String serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/posts/Insert_Post?user_name="+AesEncryption.encrypt(user.name)+"&UserState="+AesEncryption.encrypt(user.state)+"&ReportedUserState="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.user_state)+"&Post_id=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_id) + "&Group_id="+ AesEncryption.encrypt(String.valueOf(FacebookUtil.ReportPostDetail.group_id))+"&Comment_id="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.coment_id) + "&PComment_id="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.ParentComment_ID) + "&Group_name=" + AesEncryption.encrypt(Group_name) + "&Profile_name=" + AesEncryption.encrypt(user.id) + "&user_id=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_id) +  "&infringing user_name="+ AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_name)+"&Post_image=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_image)+"&userProfilePic="+AesEncryption.encrypt(user.profile_pic)+"&infringingUser_ProfilePic=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_profile_pic)+"&Comment="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.comment) +"&Post_Det=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_Detail) ;
             new WebHttpGetReq(context,WebServiceActivity.this,  check,null, this).execute(serverURL);
         }
         catch (Exception e) { e.printStackTrace(); }

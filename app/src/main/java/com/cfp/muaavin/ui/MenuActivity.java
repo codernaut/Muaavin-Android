@@ -49,14 +49,12 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
 
         friend_management = new FriendManagement();
         user_id = getIntent().getStringExtra("User_signedID");
-        //192.168.1.5  13.76.175.64
+        //192.168.1.5  13.76.175.64 //192.168.8.101
         String serverURL = null;
-        serverURL = "http://192.168.1.9:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
-
-
+        serverURL = "http://192.168.8.103:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
         //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
         //new FriendsAsynchronousLoad(contex).execute();
-
+        ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
 
     }
 

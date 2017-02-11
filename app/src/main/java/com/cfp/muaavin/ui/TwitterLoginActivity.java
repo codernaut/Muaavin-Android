@@ -75,7 +75,7 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
                     customApiClient = new TwitterApiClient(customClient);
                     TwitterCore.getInstance().addGuestApiClient(customApiClient);
                 }
-                //option = "LoadUser";
+
                 controller.loadTwitterData("LoadUser");
                 controller.loadTwitterData(option);
 
@@ -116,6 +116,12 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
         {
             DialogBox.ShowDialogBOx3(context, "Select Group ", group, 7, String.valueOf(session.getUserId()),true);
         }
+
+    }
+
+    public void InsideLoginButtonCode()
+    {
+
 
     }
 

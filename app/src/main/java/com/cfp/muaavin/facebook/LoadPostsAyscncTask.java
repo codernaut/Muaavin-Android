@@ -136,7 +136,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     {
 
         Bundle params = new Bundle();
-        params.putString("fields", "message,full_picture,story,created_time,picture,comments.limit(900){from{id,name,picture},id,message,comments.limit(900){from{id,name,picture},id,message}}");
+        params.putString("fields", "from{id,name,picture},message,full_picture,story,created_time,picture,comments.summary(true){from{id,name,picture},id,message,comments.limit(900){from{id,name,picture},id,message}}");
         GraphRequest gr = new GraphRequest(
         AccessToken.getCurrentAccessToken(),
         "/"+post_id,params,

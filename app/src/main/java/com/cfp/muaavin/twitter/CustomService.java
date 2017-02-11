@@ -1,5 +1,6 @@
 package com.cfp.muaavin.twitter;
 
+import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.models.User;
 
 import okhttp3.ResponseBody;
@@ -21,6 +22,9 @@ public interface CustomService {
 
     @GET("/1.1/users/show.json")
     Call<User> getLoggedInUser(@Query("user_id") long id );
+
+    @GET("/1.1/statuses/show.json")
+    Call<Tweet> getTweetUsingId(@Query("id") String id );
 
 
 }

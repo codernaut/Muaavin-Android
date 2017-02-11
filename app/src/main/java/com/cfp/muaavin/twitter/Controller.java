@@ -59,5 +59,10 @@ public class Controller implements TweetsAsynchronousResponse {
         {
             DialogBox.ShowDialogBOx3(context, "Select Group ", group, 7, String.valueOf(session.getUserId()),true);
         }
+
+        else if(option.equals("Load Specific Tweet"))
+        {
+            DialogBox.showTweetDialog(context, TwitterUtil.Tweet);
+        }
     }
 }

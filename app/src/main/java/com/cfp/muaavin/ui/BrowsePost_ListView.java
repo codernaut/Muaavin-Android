@@ -44,12 +44,10 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
         String serverURL = null;
         try {
             if(session==null) { TwitterUserId = "";  } else { TwitterUserId = String.valueOf(session.getUserId()); }
-            serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getLoggedInUserInformation().id)+"&isSpecificUserPost="+true+"&TwitterUserID="+AesEncryption.encrypt(TwitterUserId);
+            serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getLoggedInUserInformation().id)+"&isSpecificUserPost="+true+"&TwitterUserID="+AesEncryption.encrypt(TwitterUserId);
         } catch (Exception e) { e.printStackTrace(); }
-
-
+        
         new WebHttpGetReq(context,BrowsePost_ListView.this, 4,this,null).execute(serverURL);
-
 
     }
 
