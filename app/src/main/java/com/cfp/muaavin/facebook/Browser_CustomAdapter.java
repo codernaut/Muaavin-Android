@@ -82,6 +82,8 @@ public class Browser_CustomAdapter extends BaseAdapter {
 
         ImageView image;
 
+        ImageView ProfilePic;
+
         EditText edit_text;
 
         Button submit ;
@@ -95,6 +97,8 @@ public class Browser_CustomAdapter extends BaseAdapter {
         TextView   PostHeading;
 
         TextView   CommentHeading;
+
+        TextView FeedBack;
 
         LinearLayout linearLayout3;
 
@@ -110,25 +114,25 @@ public class Browser_CustomAdapter extends BaseAdapter {
         rowView = inflater.inflate(R.layout.browse_row_layout, null);
         final Holder holder = getHolder(rowView);//new Holder();
 
-
-
             ///////////
             final ArrayList<String> keys = new ArrayList<String>(result.keySet());
-
             String key = keys.get(position);
             Post_Details = result.get(key);
             String post_message1 =  Post_Details .get(0).post_Detail;
+            String infringingUserPic =  UrlHelper.getDecodedUrl(Post_Details .get(0).infringing_user_profile_pic);
             holder.text_view.setText(post_message1);
+            if(Post_Details.get(0).IsTwitterPost)
+            {
+              holder.PostHeading.setBackgroundColor(Color.parseColor("#00BFFF"));
+              holder.PostHeading.setText("Tweet");
+              holder.FeedBack.setBackgroundColor(Color.parseColor("#87CEFA"));
+            }
+            new ImageSelectorAsyncTask(holder.ProfilePic, holder.connectionText).execute(infringingUserPic);
 
             String image = UrlHelper.getDecodedUrl(Post_Details.get(0).post_image);
-
             LinearLayout linear_layout = (LinearLayout) rowView.findViewById(R.id.r2);
 
-
             for (int i = 0; i < Post_Details .size(); i++) {
-
-
-                String infringingUserPic = UrlHelper.getDecodedUrl(Post_Details.get(i).infringing_user_profile_pic);
 
                 String user_comment = Post_Details.get(i).infringing_user_name + " : " + Post_Details.get(i).comment;
 
@@ -166,9 +170,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
 
             }
 
-
             new ImageSelectorAsyncTask(holder.image, holder.text_view).execute(image);
-
 
             holder.submit.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -178,7 +180,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
                     try
                     {
                       if(result.get(keys.get(position)).get(0).IsTwitterPost) { TwitterFeedBack = true; }
-                      serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(FacebookLoginActivity.user.id) +"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+ "&post_id=" + AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment)+"&IsTwitterFeedBack="+TwitterFeedBack+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
+                      serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(FacebookLoginActivity.user.id) +"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+ "&post_id=" + AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment)+"&IsTwitterFeedBack="+TwitterFeedBack+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
                     } catch (Exception e) { e.printStackTrace(); }
 
                     new WebHttpGetReq(context, -1, holder.text_view, 5).execute(serverURL);
@@ -203,7 +205,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
                 String serverURL = null;
                 try {
                   if(result.get(keys.get(position)).get(0).IsTwitterPost) { TwitterFeedBack = true; }
-                  serverURL = "http://192.168.8.101:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(FacebookLoginActivity.user.id)+"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id)+"&IsTwitterPost="+result.get(keys.get(position)).get(0).IsTwitterPost+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
+                  serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(FacebookLoginActivity.user.id)+"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id)+"&IsTwitterPost="+result.get(keys.get(position)).get(0).IsTwitterPost+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
                 } catch (Exception e) { e.printStackTrace(); }
 
                 new WebHttpGetReq(context, 3,holder.total_unlikes,result.get(keys.get(position)).get(0).unlike_value).execute(serverURL);
@@ -229,6 +231,8 @@ public class Browser_CustomAdapter extends BaseAdapter {
         holder.PostHeading = (TextView)rowView.findViewById(R.id.Textbox2);
         holder.CommentHeading = (TextView)rowView.findViewById(R.id.Textbox3);
         holder.linearLayout3 = (LinearLayout)rowView.findViewById(R.id.linear3);
+        holder.ProfilePic = (ImageView) rowView.findViewById(R.id.ProfilePic);
+        holder.FeedBack = (TextView) rowView.findViewById(R.id.FeedBack);
 
         return holder;
     }

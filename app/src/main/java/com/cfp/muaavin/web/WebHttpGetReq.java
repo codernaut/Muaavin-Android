@@ -14,6 +14,7 @@ import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.PostDetail;
 import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.helper.UrlHelper;
+import com.cfp.muaavin.twitter.TwitterUtil;
 import com.cfp.muaavin.ui.R;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -111,6 +112,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             wr.write( data );
             wr.flush();
 
+
             // Get the server response
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder sb = new StringBuilder();
@@ -121,7 +123,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             Content = sb.toString();
         }
 
-        catch(Exception ex){ Error = ex.getMessage(); }
+        catch(Exception ex){ Error = ex.getMessage(); ex.printStackTrace();}
 
         finally{ try{ reader.close(); } catch(Exception ex) {ex.printStackTrace();} }
         return null;
@@ -157,21 +159,8 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
     }
  }
 
-    public   void callOnUiThread()
-    {
-        if(Content.equals("record successfully inserted"))
-        {
-            total_unlikes=total_unlikes+1;
-            uiUpdate.setText(String.valueOf(total_unlikes));
-        }
-        else
-        {
-            total_unlikes=total_unlikes-1;
-            uiUpdate.setText(String.valueOf(total_unlikes));
-        }
-    }
 
-    // Get Infringing Users Data From DB
+    // Get Infringing Users Data From Web Service
     public void getInfringingUsersDataFromDB(String Content) throws JSONException
     {
         ArrayList<String> FacebookBlockedUserIds = new ArrayList<String>();
@@ -192,7 +181,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         else if((check == 9)){  UserInterfaceDelegate.getBlockedUsers(FacebookBlockedUserIds , TwitterBlockedUserIds); }
     }
 
-    // Get Posts From DB
+    // Get Posts From Web Service
     public void getPostsFromDB(String Content) throws JSONException {
         JSONArray jsonArray = new JSONArray(Content);
         ArrayList<String> PostIDs = new ArrayList<String>();
@@ -202,9 +191,10 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             Post post = new Post();
             JSONObject jsonChildNode = jsonArray.optJSONObject(i);
             post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/"+jsonChildNode.optString("Post_ID"),0);
-            post.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost");
-            post.IsComment = jsonChildNode.optBoolean("IsComment");
-            if(!PostIDs.contains(post.id)){ PostIDs.add(post.id);  Posts.add(post); }
+            post.PostOwner.id = jsonChildNode.optString("infringingUserId");
+            if(post.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost")) {if(!TwitterUtil.BlockedUserIds.contains(post.PostOwner.id)) Posts.add(post);  };
+            if(post.IsComment = jsonChildNode.optBoolean("IsComment")){if(!FacebookUtil.BlockedUsersIds.contains(post.PostOwner.id)) Posts.add(post); };
+
         }
         Postdelegate.getUserAndPostData(Posts);
     }
@@ -222,52 +212,23 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
        PostDetail PostDetailObj = facebookUtil.getReportedPostDetail(i,jsonChildNode);
        JsonPostDetails.add(PostDetailObj);
 
-
        if(dictionary.containsKey(PostDetailObj.post_id))
        {
           ArrayList<PostDetail> reportedPostDetail = (ArrayList<PostDetail>) dictionary.get(PostDetailObj.post_id);
-          if(PostDetailObj.IsTwitterPost)
-          {
-              if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
-              dictionary.put(PostDetailObj.post_id,reportedPostDetail);
-          }
-          else
-          {
-              if(checkIfAnObjectAlreadyPresent(reportedPostDetail , PostDetailObj ))
-              {
-                  if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
-                  dictionary.put(PostDetailObj.post_id,reportedPostDetail);
-              }
-              else
-              {
-                  //if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
-                  reportedPostDetail.add(PostDetailObj); dictionary.put(PostDetailObj.post_id,reportedPostDetail);
-              }
-          }
-          //reportedPostDetail.add(PostDetailObj);
-          //dictionary.put(PostDetailObj.post_id,reportedPostDetail);
+          if(!PostDetailObj.FeedBackMessage.equals("")) { reportedPostDetail.get(0).FeedBacks.add(PostDetailObj.FeedBackMessage); }
+          dictionary.put(PostDetailObj.post_id,reportedPostDetail);
        }
        else
        {
           ArrayList<PostDetail> PostDetailslist = new ArrayList<PostDetail>();
           if(!PostDetailObj.FeedBackMessage.equals("")) { PostDetailObj.FeedBacks.add(PostDetailObj.FeedBackMessage); }
           PostDetailslist.add(PostDetailObj);
-          dictionary.put(PostDetailObj.post_id,PostDetailslist);
+          if(PostDetailObj.IsTwitterPost){if(!TwitterUtil.BlockedUserIds.contains(PostDetailObj.infringing_user_id)) dictionary.put(PostDetailObj.post_id,PostDetailslist); }
+          if(PostDetailObj.IsComment){if(!FacebookUtil.BlockedUsersIds.contains(PostDetailObj.infringing_user_id)) dictionary.put(PostDetailObj.post_id,PostDetailslist); }
        }
     }
        PostDetailDelegate.getPostsDetails(dictionary);
  }
-
-    public boolean checkIfAnObjectAlreadyPresent(ArrayList<PostDetail> Reports, PostDetail PostDetailObj)
-    {
-        boolean RecordPresent = false;
-        for(int i = 0 ; i < Reports.size() ; i++)
-        {
-            if ((PostDetailObj.ParentComment_ID.equals(Reports.get(i).ParentComment_ID)) && (PostDetailObj.coment_id.equals(Reports.get(i).coment_id)))
-                RecordPresent = true;
-        }
-        return RecordPresent;
-    }
 
 }
 

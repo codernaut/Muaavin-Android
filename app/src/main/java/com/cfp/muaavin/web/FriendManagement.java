@@ -12,6 +12,7 @@ import com.cfp.muaavin.ui.Users_ListView;
 
 import java.util.ArrayList;
 
+import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
 
 
 public class FriendManagement implements AsyncResponsePosts {
@@ -35,22 +36,10 @@ public class FriendManagement implements AsyncResponsePosts {
     public void  reportFriends( ArrayList<User> unique_users,final Context context, ArrayList<Post> posts ,final String user_id, final ArrayList<User> users)
     {
 
-
-        //Intent intent  = new Intent(context, Users_ListView.class);
         this.context = context; FacebookUtil.isUserPresent = false;
-        if (FacebookUtil.users.size() > 0)
-        {
-            Intent intent = new Intent(context,Users_ListView.class); intent.putExtra("isTwitterData",false);
-            context.startActivity(intent);
-        }
-        else{ new LoadPostsAyscncTask(context, FriendManagement.this, user_id, false, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>()); }
+        clearFacebookData();
+        new LoadPostsAyscncTask(context, FriendManagement.this, user_id, false, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
 
-        //intent.putExtra("user_id",user_id);
-        //intent.putExtra("user_posts",posts);
-        //intent.putExtra("commented_users",unique_users);
-        //intent.putExtra("isTwitterData",false);
-
-        //context.startActivity(intent);
     }
 
     public void Browse(Context context)
@@ -81,6 +70,7 @@ public class FriendManagement implements AsyncResponsePosts {
 
     @Override
     public void getUserAndPostData(ArrayList<Post> result) {
+        FacebookUtil.getFriends();
         Intent intent = new Intent(context, Users_ListView.class);
         intent.putExtra("isTwitterData",false);
         context.startActivity(intent);

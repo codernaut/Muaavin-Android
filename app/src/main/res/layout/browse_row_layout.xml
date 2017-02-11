@@ -11,9 +11,18 @@
         android:background="#3b5998"
         android:textColor="#ffffff" />
 
+    <ImageView
+        android:id="@+id/ProfilePic"
+        android:layout_height="50dp"
+        android:layout_width="50dp"
+        android:layout_below="@+id/Textbox2"
+        />
+
     <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:id="@+id/Textbox1" android:textSize="20dp"
-        android:layout_below="@+id/Textbox2"/>
+        android:layout_below="@+id/Textbox2"
+        android:layout_toRightOf="@+id/ProfilePic"
+        />
 
     <ImageView
         android:id="@+id/Image_view"
@@ -46,7 +55,7 @@
     <TextView
         android:text=" FeedBack :" android:layout_width="match_parent"
         android:layout_height="match_parent" android:id="@+id/FeedBack" android:textSize="20dp"
-        android:background="#3b5998" android:textColor="#ffffff"
+        android:background="#427bdd" android:textColor="#ffffff"
      />
 
     <LinearLayout

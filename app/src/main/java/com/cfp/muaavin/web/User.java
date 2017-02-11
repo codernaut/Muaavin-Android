@@ -18,6 +18,7 @@ public class User implements Serializable {
     public String profile_url;
     public static boolean user_authentication = true;
     public String state;
+    public String ScreenName;
     public boolean isTwitterUser;
 
    public User()
@@ -26,6 +27,7 @@ public class User implements Serializable {
 
        profile_pic = "";
        profile_url = "";
+       ScreenName = "";
 
 
     }

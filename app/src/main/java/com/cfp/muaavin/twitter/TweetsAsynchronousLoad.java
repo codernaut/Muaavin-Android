@@ -24,6 +24,7 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import com.twitter.sdk.android.core.models.*;
 
 /**
  * Created by Tooba Saeed on 04/01/2017.
@@ -43,6 +44,8 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
     com.twitter.sdk.android.core.models.User user;
     public String option;
     public static  long maxId = 0l;//804552725816086528l 816753471089209344l;
+
+
 
     TweetsAsynchronousResponse TweetsDelegate;
 
@@ -68,6 +71,7 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
         final StatusesService service = Twitter.getInstance().getApiClient().getStatusesService();
         TwitterSession session = Twitter.getSessionManager().getActiveSession();
         Call<ResponseBody> CallResponseBody = null; Call<com.twitter.sdk.android.core.models.User>  CallUser = null;
+        Call<Tweet>  CallTweet = null;
         if(option.equals("LoadTweets"))
         {
             if(maxId == 0l) { TweetList = service.homeTimeline(null, null, null, null, null, null, null); }
@@ -81,6 +85,15 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
 
             return Tweets;
         }
+
+        else if(option.equals("Load Specific Tweet"))
+        {
+            CallTweet = new MyTwitterApiClient(session).getCustomService().getTweetUsingId("828139684148682752");
+            try{  TwitterUtil.Tweet = CallTweet .execute().body();}
+            catch (IOException e) { e.printStackTrace(); }
+            return Tweets;
+        }
+
         else if(option.equals("LoadUser"))
         {
             CallUser = new MyTwitterApiClient(session).getCustomService().getLoggedInUser(session.getUserId());
@@ -136,6 +149,7 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
                 user.name = object.optString("name");
                 user.id = object.optString("id_str");
                 user.profile_pic = object.optString("profile_image_url");
+                user.profile_url = "https://twitter.com/"+object.optString("screen_name");
                 user.state = "UnBlocked";
                 users.add(user);
                 TwitterUtil.Followers.add(user);
