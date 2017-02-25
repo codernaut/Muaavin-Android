@@ -40,7 +40,8 @@ public class Posts_CustomAdapter extends BaseAdapter {
 
     Context context;
     private static LayoutInflater inflater=null;
-    public String[] group = {"A","B","C"};
+    //public String[] group = {"A","B","C"};
+    String[] group = new String[]{"Sexual harassment", "Incitement to violence","Trans rights"};
     public String user_signed_inID;
     boolean ClipBoardOption ;
     boolean IsReportedPost = false;
@@ -114,10 +115,10 @@ public class Posts_CustomAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(result.get(position).message,"#", " "), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
-                FacebookUtil.ReportPostDetail.setCommentInformation(result.get(position).Comments.get(num).comment_id,removeHash(result.get(position).Comments.get(num).message, "#", " "), result.get(position).Comments.get(num).parent_comment_id,"");
+                FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(removeHash(result.get(position).message,"#", " "),"'","''"), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
+                FacebookUtil.ReportPostDetail.setCommentInformation(result.get(position).Comments.get(num).comment_id,removeHash(removeHash(result.get(position).Comments.get(num).message, "#", " "),"'","''"), result.get(position).Comments.get(num).parent_comment_id,"");
 
-                if(ClipBoardOption) getInfringingUserDetail(position,IsReportedPost);
+                if(ClipBoardOption) getInfringingUserDetail(position,num,IsReportedPost);
 
                 DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,false);
                 }
@@ -131,9 +132,9 @@ public class Posts_CustomAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 IsReportedPost = true;
-                FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(result.get(position).message,"#", " "), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
-                FacebookUtil.ReportPostDetail.setCommentInformation(" ",removeHash(result.get(position).message, "#", " "), " ","");
-                getInfringingUserDetail(position,IsReportedPost);
+                FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(removeHash(result.get(position).message,"#", " "),"'","''"), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
+                FacebookUtil.ReportPostDetail.setCommentInformation(" ",removeHash(removeHash(result.get(position).message, "#", " "),"'","''"), " ","");
+                getInfringingUserDetail(position,0,IsReportedPost);
                 DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,false);
             }
         });
@@ -181,14 +182,12 @@ public class Posts_CustomAdapter extends BaseAdapter {
 
         if (text.contains(replacedValue)) {
             text = text.replaceAll(replacedValue, replaceWith);
-
         }
         return text;
     }
 
-    public void getInfringingUserDetail(int position,boolean IsReportedPost)
+    public void getInfringingUserDetail(int position,int commentIndex, boolean IsReportedPost)
     {
-
         if(IsReportedPost)
         {
             FacebookUtil.ReportPostDetail.infringing_user_name = result.get(position).PostOwner.name;
@@ -199,9 +198,9 @@ public class Posts_CustomAdapter extends BaseAdapter {
         }
         else
         {
-            FacebookUtil.ReportPostDetail.infringing_user_name = MenuActivity.users.get(position).name;
-            FacebookUtil.ReportPostDetail.infringing_user_id = MenuActivity.users.get(position).id;
-            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = MenuActivity.users.get(position).profile_pic;
+            FacebookUtil.ReportPostDetail.infringing_user_name = result.get(position).Comments.get(commentIndex).name;//MenuActivity.users.get(position).name;
+            FacebookUtil.ReportPostDetail.infringing_user_id = result.get(position).Comments.get(commentIndex).user_id;
+            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = MenuActivity.users.get(commentIndex).profile_pic;
             FacebookUtil.ReportPostDetail.infringing_user_profile_pic = UrlHelper.getEncodedUrl(FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
             FacebookUtil.ReportPostDetail.user_state = "UnBlocked";
         }

@@ -2,18 +2,29 @@ package com.cfp.muaavin.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.cfp.muaavin.web.User;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-
+import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,13 +32,12 @@ import java.util.Arrays;
 public class FacebookLoginActivity extends ActionBarActivity  {
 
         TextView textview;
-
+        Button loginButton;
+        CheckBox checkBox;
         public Context context;
         String user_id;
         public static ArrayList<User> friend_list = new ArrayList<User>();
         public static User user = new User();
-
-
 
 
         CallbackManager callbackManager;
@@ -40,56 +50,69 @@ public class FacebookLoginActivity extends ActionBarActivity  {
         setContentView(R.layout.activity_facebook_login);
 
         textview = (TextView)findViewById(R.id.tv2);
+        loginButton = (Button)findViewById(R.id.login_button);
+        checkBox = (CheckBox) findViewById(R.id.checkBox);
+
         context = FacebookLoginActivity.this;
 
-       /* AppEventsLogger.activateApp(this);*/
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-        callbackManager = CallbackManager.Factory.create();
+                   SharedPreferences sp = getSharedPreferences("Login", 0); // Get data from Shared Preferences...
 
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("user_status", "user_photos", "user_videos", "user_tagged_places", "user_actions.video", "user_posts", "user_friends", "public_profile", "read_page_mailboxes", "read_custom_friendlists","user_managed_groups"));
+                   if (!sp.getString("AccessToken", "").equals("")) {
 
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                      AccessToken accessToken = new AccessToken(sp.getString("AccessToken", ""), sp.getString("ApplicationId", ""), sp.getString("UserId", ""), sp.getStringSet("Permissions", null), sp.getStringSet("DeclinedPermissions", null), null, null, null);
+                      AccessToken.setCurrentAccessToken(accessToken);
+                      Profile profile = new Profile(sp.getString("ProfileId", ""), sp.getString("FirstName", ""), sp.getString("MiddleName", ""), sp.getString("LastName", ""), sp.getString("Name", ""), Uri.parse(sp.getString("Url", "")));
+                      Profile.setCurrentProfile(profile);
+                      if(!checkBox.isChecked()){ removeDataFromSharedPreferences(); }
+
+                         Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
+                         intent.putExtra("User_signedID", sp.getString("UserId", ""));
+                         startActivity(intent);
+                      }
+                   else {
+                        callbackManager = CallbackManager.Factory.create();
+                        LoginManager.getInstance().logInWithReadPermissions(FacebookLoginActivity.this, Arrays.asList("email", "user_status", "user_photos", "user_videos", "user_tagged_places", "user_actions.video", "user_posts", "user_friends", "public_profile", "read_page_mailboxes", "read_custom_friendlists", "user_managed_groups"));
+
+                        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
 
-              @Override
-              public void onSuccess(LoginResult loginResult) {
+                        @Override
+                        public void onSuccess(LoginResult loginResult) {
 
-                 user_id = loginResult.getAccessToken().getUserId();
-                 user.id = user_id;
+                            fetchProfile();
+                            user_id = loginResult.getAccessToken().getUserId(); // 10205871243740520
+                            user.id = user_id;
 
-                 Toast.makeText(FacebookLoginActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
+                            Toast.makeText(FacebookLoginActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
+                            intent.putExtra("User_signedID", user_id);
+                            startActivity(intent);
+                            }
 
-                 Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
-                 intent.putExtra("User_signedID", user_id);
-                 startActivity(intent);
+                         @Override
+                         public void onCancel() {
+                             Toast.makeText(FacebookLoginActivity.this, "Cancel", Toast.LENGTH_LONG).show();
+                             }
 
-                 }
+                         @Override
+                         public void onError(FacebookException exception) {
+                             Toast.makeText(FacebookLoginActivity.this, "Error", Toast.LENGTH_LONG).show();
+                         } });
 
-                    @Override
-                    public void onCancel() {
-
-                        Toast.makeText(FacebookLoginActivity.this, "Cancel",Toast.LENGTH_LONG).show();
-
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-
-                        Toast.makeText(FacebookLoginActivity.this, "Error",Toast.LENGTH_LONG).show();
-
-                    }
-                });
-
+                        }
+                }
+            });
     }
 
-
-
-        @Override
-        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode,resultCode, data);
-
-         }
+    }
 
     @Override
     public void onBackPressed() {
@@ -99,6 +122,39 @@ public class FacebookLoginActivity extends ActionBarActivity  {
         startMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
 
+    }
+
+    private void fetchProfile() {
+        GraphRequest request = GraphRequest.newMeRequest(
+            AccessToken.getCurrentAccessToken(),
+            new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject object, GraphResponse response) {
+            // this is where you should have the profile
+            Log.v("fetched info", object.toString());
+            Profile.setCurrentProfile(new Profile(object.optString("id"),object.optString("name"),object.optString("name"),object.optString("name"),object.optString("name"),Uri.parse(object.optString("link"))));//linkUri
+
+            final AccessToken accessToken = AccessToken.getCurrentAccessToken();
+            SharedPreferences sp = getSharedPreferences("Login", 0);
+            SharedPreferences.Editor Ed = sp.edit();
+            if(checkBox.isChecked()) {
+                Ed.putString("AccessToken", accessToken.getToken()).putString("ApplicationId", accessToken.getApplicationId()).putStringSet("Permissions", accessToken.getPermissions()).putStringSet("DeclinedPermissions", accessToken.getDeclinedPermissions()).putString("UserId", accessToken.getUserId()).putString("ProfileId", Profile.getCurrentProfile().getId()).putString("Name", Profile.getCurrentProfile().getName()).putString("Url", Profile.getCurrentProfile().getProfilePictureUri(20, 20).toString()).putString("access_expires",accessToken.getExpires().toString());
+                Ed.commit();
+            } else{  Ed.putString("AccessToken", ""); Ed.commit();}
+            } });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,link"); //write the fields you need
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    public void removeDataFromSharedPreferences()
+    {
+        SharedPreferences mySPrefs = getSharedPreferences("Login",0);
+        SharedPreferences.Editor editor = mySPrefs.edit();
+        editor.remove("AccessToken");
+        editor.remove("ApplicationId");
+        editor.apply();
     }
 
 }

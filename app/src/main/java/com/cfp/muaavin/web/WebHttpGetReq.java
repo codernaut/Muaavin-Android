@@ -16,10 +16,18 @@ import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.twitter.TwitterUtil;
 import com.cfp.muaavin.ui.R;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -38,8 +46,6 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
     public Activity activity;
     public static Activity a;
     TextView uiUpdate;
-    TextView jsonParsed ;
-
     public static Context context ;
     private String Error = null;
     private ProgressDialog Dialog ;
@@ -58,14 +64,14 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         Postdelegate = PostDelegate;
         UserInterfaceDelegate = userInterfaceDelegate;
         this.activity = activity;
-
     }
+
     public   WebHttpGetReq(Context c, int check, TextView text_view, int value)
     {
         context  = c;
         this.check = check;
         Dialog = new ProgressDialog(context);
-        uiUpdate = text_view;
+        //uiUpdate = text_view;
         total_unlikes = value;
     }
 
@@ -77,8 +83,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         activity = a;
         this.check = check;
         Dialog = new ProgressDialog(context);
-        uiUpdate = (TextView) activity.findViewById(R.id.output);
-        jsonParsed = (TextView) activity.findViewById(R.id.jsonParsed);
+        //uiUpdate = (TextView) activity.findViewById(R.id.output);
         PostDetailDelegate = delegate;
     }
 
@@ -104,7 +109,14 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         try
         {
             URL url = new URL(params[0]);
+            //////////
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpGet= new HttpGet(params[0]);
+            HttpResponse response = httpclient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            InputStream is = entity.getContent();
 
+            //////////
             URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);
@@ -114,7 +126,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
 
             // Get the server response
-            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(/*conn.getInputStream())*/is));
             StringBuilder sb = new StringBuilder();
             String line = null;
 
@@ -196,7 +208,7 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             if(post.IsComment = jsonChildNode.optBoolean("IsComment")){if(!FacebookUtil.BlockedUsersIds.contains(post.PostOwner.id)) Posts.add(post); };
 
         }
-        Postdelegate.getUserAndPostData(Posts);
+        Postdelegate.getUserAndPostData(Posts,"BrowsePosts");
     }
 
     // Get Reports From WebService

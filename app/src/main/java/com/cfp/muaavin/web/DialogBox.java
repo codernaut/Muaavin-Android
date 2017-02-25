@@ -1,11 +1,9 @@
     package com.cfp.muaavin.web;
 
-    import android.app.Activity;
     import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
+    import android.content.Context;
+    import android.content.DialogInterface;
     import android.content.Intent;
-
     import com.cfp.muaavin.facebook.AsyncResponsePosts;
     import com.cfp.muaavin.facebook.FacebookUtil;
     import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
@@ -14,29 +12,24 @@ import android.content.DialogInterface;
     import com.cfp.muaavin.twitter.TwitterUtil;
     import com.cfp.muaavin.ui.BrowsePost_ListView;
     import com.cfp.muaavin.ui.Browse_Activity;
-    import com.cfp.muaavin.ui.MenuActivity;
     import com.cfp.muaavin.ui.TwitterLoginActivity;
     import com.cfp.muaavin.ui.WebServiceActivity;
-    import com.twitter.sdk.android.Twitter;
     import com.twitter.sdk.android.core.models.Tweet;
-
     import java.util.ArrayList;
-
     import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
     public class DialogBox {
 
+    static String[] group  =  {"A","B","C","All"};
 
-
-    public static void ShowDialogBOx3(final Context context , String str , final String[] group, final int option , final String user_id , final boolean isTwitterData)
+    public static void ShowDialogBOx3(final Context context , String str , final String[] category, final int option , final String user_id , final boolean isTwitterData)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(str);
 
-        builder.setItems(group, new DialogInterface.OnClickListener() {
+        builder.setItems(category, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
 
                 String group_name = group[which];
                 if(isTwitterData)
@@ -60,7 +53,6 @@ import android.content.DialogInterface;
                 }
                 else {
                     FacebookUtil.ReportPostDetail.group_id = which + 1;
-
 
                     if (option == 0) {
                         Intent intent = new Intent(context, WebServiceActivity.class);
@@ -117,13 +109,12 @@ import android.content.DialogInterface;
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
 
-                    /*MenuActivity.*/
                     if(IsFacebookPost) {
                         boolean isClipboardData = true;
                         FacebookUtil.users = new ArrayList<User>();
                         FacebookUtil.friendsIds = new ArrayList<String>();
                         LoadPostsAyscncTask.count = 0;
-                        new LoadPostsAyscncTask(context, delegate, user_id, isClipboardData, post_id, new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+                        new LoadPostsAyscncTask("ReportUsers",context, delegate, user_id, isClipboardData, post_id, new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
                     }
 
                     else {  if(session == null)

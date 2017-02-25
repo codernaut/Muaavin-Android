@@ -44,9 +44,9 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
         String serverURL = null;
         try {
             if(session==null) { TwitterUserId = "";  } else { TwitterUserId = String.valueOf(session.getUserId()); }
-            serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getLoggedInUserInformation().id)+"&isSpecificUserPost="+true+"&TwitterUserID="+AesEncryption.encrypt(TwitterUserId);
+            serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getLoggedInUserInformation().id)+"&isSpecificUserPost="+true+"&TwitterUserID="+AesEncryption.encrypt(TwitterUserId);
         } catch (Exception e) { e.printStackTrace(); }
-        
+
         new WebHttpGetReq(context,BrowsePost_ListView.this, 4,this,null).execute(serverURL);
 
     }
@@ -54,14 +54,11 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
 
 
     @Override
-    public void getUserAndPostData(ArrayList<Post> result) {
+    public void getUserAndPostData(ArrayList<Post> result, String option) {
 
         ArrayList<Post> Posts = new ArrayList<Post>();
         BrowsePostCustomAdapter c = new BrowsePostCustomAdapter(BrowsePost_ListView.this, result, Group_name , User.getLoggedInUserInformation().id);
         browsePost_Listview.setAdapter(c);
-
-
-
 
     }
 }

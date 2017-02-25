@@ -7,6 +7,7 @@ import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
@@ -31,6 +32,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
     ListView UserListView ;
     Context context;
     boolean isClipboardData, isTwitterData;
+    Button LoadButton;
 
 
 
@@ -40,6 +42,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
         setContentView(R.layout.users);
         context = this;
         UserListView = (ListView) findViewById(R.id.listView2);
+        LoadButton = (Button)  findViewById(R.id.LoadButton);
         isTwitterData = getIntent().getBooleanExtra("isTwitterData",false);
 
         Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, FacebookUtil.Posts,FacebookUtil.users,isTwitterData);
@@ -49,7 +52,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
 
 
     @Override // Get Facebook Posts and Users
-    public void getUserAndPostData(ArrayList<Post> result) {
+    public void getUserAndPostData(ArrayList<Post> result,String option) {
 
         //Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, FacebookUtil.Posts,Unique_users,isTwitterData);
         //UserListView.setAdapter(c);
@@ -61,7 +64,7 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
     {
         isClipboardData= false; FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
         if (LoadPostsAyscncTask.nextResultsRequests != null)
-        new LoadPostsAyscncTask(context, Users_ListView.this, User.getLoggedInUserInformation().id, isClipboardData, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+        new LoadPostsAyscncTask("ReportUsers",context, Users_ListView.this/*,UserListView*/, User.getLoggedInUserInformation().id, isClipboardData, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
     }
 
 }

@@ -42,7 +42,7 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener, Asyn
             boolean isClipboardData = false;
             if (LoadPostsAyscncTask.nextResultsRequests != null)
             {
-                 new LoadPostsAyscncTask(context,EndlessScrollListener.this,  user.id, isClipboardData, "", /*User_Posts*/new ArrayList<Post>(), users).execute(new ArrayList<Post>());
+                 new LoadPostsAyscncTask("ReportUsers",context,EndlessScrollListener.this,  user.id, isClipboardData, "", /*User_Posts*/new ArrayList<Post>(), users).execute(new ArrayList<Post>());
             }
 
         }
@@ -62,7 +62,7 @@ public class EndlessScrollListener implements AbsListView.OnScrollListener, Asyn
     }
 
     @Override
-    public void getUserAndPostData(ArrayList<Post> result) {
+    public void getUserAndPostData(ArrayList<Post> result, String option) {
 
         users = LoadPostsAyscncTask.getUsers();
         ////////

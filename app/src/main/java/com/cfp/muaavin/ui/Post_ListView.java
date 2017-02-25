@@ -47,19 +47,15 @@ public class Post_ListView extends ActionBarActivity implements AsyncResponsePos
 
     public void loadPosts(View view)
     {
-        if(IsTwitterData) {}
-        else
+        if (LoadPostsAyscncTask.nextResultsRequests != null)
         {
-            if (LoadPostsAyscncTask.nextResultsRequests != null)
-            {
-                new LoadPostsAyscncTask(context, Post_ListView.this, User.getLoggedInUserInformation().id, ClipBoardOption, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
-            }
+            new LoadPostsAyscncTask("ReportUsers",context, Post_ListView.this, User.getLoggedInUserInformation().id, ClipBoardOption, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
         }
     }
 
 
     @Override
-    public void getUserAndPostData(ArrayList<Post> result)
+    public void getUserAndPostData(ArrayList<Post> result, String option)
     {
         SelectivePosts = FacebookUtil.Posts;
         SelectivePosts = Users_CustomAdapter.getSelectivePosts(FacebookUtil.ReportPostDetail.infringing_user_id, SelectivePosts);

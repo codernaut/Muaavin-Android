@@ -55,13 +55,8 @@ public class MainActivity extends ActionBarActivity {
 
                 Intent intent = new Intent(MainActivity.this, FacebookLoginActivity.class);
                 startActivity(intent);
-
             }
         });
-
-
-
-
 
     }
 
@@ -72,10 +67,5 @@ public class MainActivity extends ActionBarActivity {
         startMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
-
     }
-
-
-
-
 }

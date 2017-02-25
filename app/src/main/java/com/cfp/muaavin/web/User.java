@@ -38,7 +38,7 @@ public class User implements Serializable {
 
         Profile profile = Profile.getCurrentProfile();
         user.id = AccessToken.getCurrentAccessToken().getUserId();
-        user.name = profile.getFirstName() + " " + profile.getLastName();
+        user.name = profile.getName();
         user.profile_pic = (profile.getProfilePictureUri(20, 20).toString());
         user.state = "UnBlocked";
         return user;
