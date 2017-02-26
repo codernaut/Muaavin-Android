@@ -71,8 +71,6 @@ public class Higlights_CustomAdapter extends BaseAdapter {
         ImageView image;
 
         Button userProfile;
-
-
     }
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -85,7 +83,6 @@ public class Higlights_CustomAdapter extends BaseAdapter {
         holder.userProfile = (Button)rowView.findViewById(R.id.UserProfile);
 
         holder.text_view.setText(" "+ infringing_friends.get(position).name);
-
 
 
         holder.userProfile.setOnClickListener(new View.OnClickListener() {

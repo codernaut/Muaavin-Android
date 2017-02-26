@@ -4,6 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 
 import com.cfp.muaavin.ui.FacebookLoginActivity;
 import com.cfp.muaavin.ui.MenuActivity;
@@ -37,9 +40,10 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     public ArrayList<Comment> comments = new ArrayList<Comment>();
     public static ArrayList<String>  friendsIds = new ArrayList<String>();
     boolean isClipboardData;
+    String Option;
 
 
-    public LoadPostsAyscncTask(Context context, AsyncResponsePosts delegate , String user_id, boolean isClipboardData, String post_id,ArrayList<Post> Posts,ArrayList<User> users) {
+    public LoadPostsAyscncTask(String option, Context context, AsyncResponsePosts delegate , /*ListView listView,*/  String user_id, boolean isClipboardData, String post_id, ArrayList<Post> Posts, ArrayList<User> users) {
 
         this.delegate = delegate;
         userId = user_id;
@@ -48,6 +52,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         PostResponse = true;
         this.Posts = Posts;
         this.context = context;
+        Option = option;
     }
 
     @Override
@@ -55,8 +60,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         dialog = new ProgressDialog(context);
         dialog.setMessage("Loading Posts, Please wait...");
         dialog.show();
-        super.onPreExecute();
-
+        //super.onPreExecute();
     }
 
     @Override
@@ -72,7 +76,6 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
             }
             FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
         }
-
         else
         {
             Posts = new ArrayList<Post>();
@@ -86,12 +89,11 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     protected void onPostExecute(ArrayList<Post> result)
     {
         if (dialog.isShowing()) { dialog.dismiss(); }
-        delegate.getUserAndPostData(result);
+        delegate.getUserAndPostData(result,Option);
     }
 
     public ArrayList<Post> getAllPosts(final ArrayList<Post> posts)
     {
-
         // 10205871243740520
         if(count == 0) {
             Bundle params = new Bundle();
@@ -129,7 +131,6 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
             nextResultsRequests = lastGraphResponse.getRequestForPagedResults(GraphResponse.PagingDirection.NEXT);
         }
         return Posts;
-
     }
 
     public void getPost(final String post_id)// get Single post (Clipboard Post)

@@ -27,6 +27,7 @@ import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
 import com.cfp.muaavin.web.WebHttpGetReq;
+import com.facebook.Profile;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -180,7 +181,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
                     try
                     {
                       if(result.get(keys.get(position)).get(0).IsTwitterPost) { TwitterFeedBack = true; }
-                      serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(FacebookLoginActivity.user.id) +"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+ "&post_id=" + AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment)+"&IsTwitterFeedBack="+TwitterFeedBack+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
+                      serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(Profile.getCurrentProfile().getId()) +"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+ "&post_id=" + AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment)+"&IsTwitterFeedBack="+TwitterFeedBack+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
                     } catch (Exception e) { e.printStackTrace(); }
 
                     new WebHttpGetReq(context, -1, holder.text_view, 5).execute(serverURL);
@@ -205,7 +206,7 @@ public class Browser_CustomAdapter extends BaseAdapter {
                 String serverURL = null;
                 try {
                   if(result.get(keys.get(position)).get(0).IsTwitterPost) { TwitterFeedBack = true; }
-                  serverURL = "http://192.168.1.13:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(FacebookLoginActivity.user.id)+"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id)+"&IsTwitterPost="+result.get(keys.get(position)).get(0).IsTwitterPost+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
+                  serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(Profile.getCurrentProfile().getId())+"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id)+"&IsTwitterPost="+result.get(keys.get(position)).get(0).IsTwitterPost+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
                 } catch (Exception e) { e.printStackTrace(); }
 
                 new WebHttpGetReq(context, 3,holder.total_unlikes,result.get(keys.get(position)).get(0).unlike_value).execute(serverURL);

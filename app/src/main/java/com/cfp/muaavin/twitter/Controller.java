@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.ui.Tweet_ListView;
-import com.cfp.muaavin.ui.TwitterLoginActivity;
 import com.cfp.muaavin.web.DialogBox;
 
 import java.util.ArrayList;
@@ -19,16 +18,13 @@ import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 public class Controller implements TweetsAsynchronousResponse {
 
     public Context context;
-    public String[] group = {"A","B","C","All"};
+    //public String[] group = {"A","B","C","All"};
+    String[] group = new String[]{"Sexual harassment", "Incitement to violence","Trans rights","All of the above"};
     TweetsAsynchronousResponse TwitterAsyncDelegate = this;
 
     public Controller(Context context)
     {
         this.context = context;
-
-        /*if(isTwitterUserBlocked() == false)
-        new TweetsAsynchronousLoad(context, TwitterAsyncDelegate,option).execute();*/
-
     }
 
     public boolean isTwitterUserBlocked()
@@ -36,12 +32,10 @@ public class Controller implements TweetsAsynchronousResponse {
         if(TwitterUtil.BlockedUserIds.contains(String.valueOf(session.getUserId())))
         {  return true; }
         else { return false; }
-
     }
 
     public void loadTwitterData(String option)
     {
-
         if(isTwitterUserBlocked() == false)
         new TweetsAsynchronousLoad(context, TwitterAsyncDelegate,option).execute();
     }

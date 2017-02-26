@@ -29,7 +29,8 @@ public class TwitterLoginActivity extends ActionBarActivity implements TweetsAsy
     public static TwitterSession session = null;
     Context context ;
     String option;
-    public String[] group = {"A","B","C","All"};
+    //public String[] group = {"A","B","C","All"};
+    String[] group = new String[]{"Sexual harassment", "Incitement to violence","Trans rights","All of the above"};
     public Controller controller;
 
 

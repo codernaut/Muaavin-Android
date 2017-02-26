@@ -17,6 +17,8 @@ import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.User;
 import com.cfp.muaavin.web.FriendManagement;
 import com.cfp.muaavin.web.WebHttpGetReq;
+import com.facebook.login.LoginManager;
+
 import java.util.ArrayList;
 import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
 import static com.cfp.muaavin.twitter.TwitterUtil.clearTwitterData;
@@ -33,7 +35,6 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
     public static int check = 0;
     ArrayList<User> users_comments;
     public static ArrayList<User> users = new ArrayList<User>() ;
-    public String[] group = {"A","B","C","All"};
     Controller controller;
 
 
@@ -51,10 +52,10 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         user_id = getIntent().getStringExtra("User_signedID");
         //192.168.1.5  13.76.175.64 //192.168.8.101
         String serverURL = null;
-        serverURL = "http://192.168.8.103:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
-        //new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
+        serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/Users/getBlockedUsers?";
+        new WebHttpGetReq(contex,MenuActivity.this, 9,null, this).execute(serverURL);
         //new FriendsAsynchronousLoad(contex).execute();
-        ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
+        //ClipBoardHelper.getPostFromClipBoard(contex , this, user_id );
 
     }
 
@@ -73,7 +74,6 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
             intent.putExtra("option", "LoadTweets"); startActivity(intent);
         }
         else {  controller.loadTwitterData( "LoadTweets"); }
-
     }
 
     public void Highlights(View v)
@@ -106,12 +106,19 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
         friend_management.BrowsePost(contex, user_id);
     }
 
+    public  void LogOut(View view)
+    {
+        LoginManager.getInstance().logOut();
+        Intent intent = new Intent(MenuActivity.this,FacebookLoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
 
 
 
 
     @Override
-    public void getUserAndPostData(ArrayList<Post> result) {
+    public void getUserAndPostData(ArrayList<Post> result, String option) {
 
          if(LoadPostsAyscncTask.getPostResponse() == true)
          {
@@ -125,7 +132,7 @@ public  class MenuActivity extends ActionBarActivity implements  AsyncResponsePo
             contex.startActivity(intent);
          }
 
-            else { DialogBox.showErrorDialog(contex); }
+         else { DialogBox.showErrorDialog(contex); }
 
     }
 
