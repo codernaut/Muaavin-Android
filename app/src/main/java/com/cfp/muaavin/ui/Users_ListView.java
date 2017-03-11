@@ -1,33 +1,31 @@
 package com.cfp.muaavin.ui;
 
+import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
+import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
-import com.cfp.muaavin.facebook.EndlessScrollListener;
 import com.cfp.muaavin.facebook.FacebookUtil;
-import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
+import com.cfp.muaavin.loaders.PostsLoadAsyncTask;
 import com.cfp.muaavin.facebook.Post;
-import com.cfp.muaavin.facebook.Users_CustomAdapter;
-import com.cfp.muaavin.twitter.TweetsAsynchronousLoad;
-import com.cfp.muaavin.twitter.TweetsAsynchronousResponse;
-import com.cfp.muaavin.twitter.TwitterUtil;
-import com.cfp.muaavin.web.User;
-import com.twitter.sdk.android.Twitter;
-
+import com.cfp.muaavin.adapter.Users_CustomAdapter;
+import com.cfp.muaavin.facebook.User;
 import java.util.ArrayList;
 
-import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
+import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 
 
-public class Users_ListView extends ActionBarActivity implements AsyncResponsePosts{
+public class Users_ListView extends Fragment implements AsyncResponsePosts{
 
     ListView UserListView ;
     Context context;
@@ -37,34 +35,65 @@ public class Users_ListView extends ActionBarActivity implements AsyncResponsePo
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.users);
-        context = this;
-        UserListView = (ListView) findViewById(R.id.listView2);
-        LoadButton = (Button)  findViewById(R.id.LoadButton);
-        isTwitterData = getIntent().getBooleanExtra("isTwitterData",false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+                                 {
+        //super.onCreate(savedInstanceState);
+        ///////////////////
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
+        //////////////////
+        //setContentView(R.layout.users);
+        View view  = inflater.inflate(R.layout.users, container, false);
+        context = getActivity();
+        UserListView = (ListView) view.findViewById(R.id.listView2);
+        LoadButton = (Button)  view.findViewById(R.id.LoadButton);
+        isTwitterData = getArguments().getBoolean("isTwitterData");
 
-        Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, FacebookUtil.Posts,FacebookUtil.users,isTwitterData);
+        Users_CustomAdapter c = new Users_CustomAdapter( context, getActivity(),FacebookUtil.Posts,FacebookUtil.users,isTwitterData);
         UserListView.setAdapter(c);
 
-    }
+        LoadButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            isClipboardData= false; FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
+            if (PostsLoadAsyncTask.nextResultsRequests != null)
+                new PostsLoadAsyncTask("ReportUsers",context, Users_ListView.this, User.getLoggedInUserInformation().id, isClipboardData, "me", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+        }});
 
+        return view;
+    }
 
     @Override // Get Facebook Posts and Users
     public void getUserAndPostData(ArrayList<Post> result,String option) {
-
-        //Users_CustomAdapter c = new Users_CustomAdapter( Users_ListView.this, FacebookUtil.Posts,Unique_users,isTwitterData);
-        //UserListView.setAdapter(c);
-        //lv.setOnScrollListener(new EndlessScrollListener(Users_ListView.this, User_posts, Unique_users, lv));
         ((BaseAdapter) UserListView.getAdapter()).notifyDataSetChanged();
     }
 
     public void LoadUsers(View view)
     {
         isClipboardData= false; FacebookUtil.isUserPresent = false; // is Any user found in currently retrievd posts
-        if (LoadPostsAyscncTask.nextResultsRequests != null)
-        new LoadPostsAyscncTask("ReportUsers",context, Users_ListView.this/*,UserListView*/, User.getLoggedInUserInformation().id, isClipboardData, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+        if (PostsLoadAsyncTask.nextResultsRequests != null)
+        new PostsLoadAsyncTask("ReportUsers",context, Users_ListView.this, User.getLoggedInUserInformation().id, isClipboardData, "me", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
     }
 
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.layout, menu);
+        return true;
+    }*/
+
+   /* @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_new_quote:
+                // TODO put your code here to respond to the button tap
+                LogOut();
+                Intent intent = new Intent(Users_ListView.this,FacebookLoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
+            default:  return super.onOptionsItemSelected(item);
+        }
+    }
+*/
 }

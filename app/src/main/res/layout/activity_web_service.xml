@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#dfe3ee"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     >
 
     <TextView
@@ -10,19 +9,19 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="      "
-    android:background="#3b5998"
-    android:textColor="#ffffff"
-    android:textSize="30dp"
+    android:textColor="#000000"
+    android:textSize="20dp"
+    android:layout_marginBottom="10dp"
     />
 
     <ListView android:id="@+id/listView1"
-    android:layout_height="500dp"
+    android:layout_height="425dp"
     android:layout_width="fill_parent"
     android:layout_below="@+id/output"/>
 
     <Button android:id="@+id/LoadButton"
     android:layout_below="@+id/listView1"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:layout_width="fill_parent"
     android:text="Load more Users"
     android:onClick="LoadUsers"/>

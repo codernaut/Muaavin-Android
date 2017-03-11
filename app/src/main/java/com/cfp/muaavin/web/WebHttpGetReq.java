@@ -5,23 +5,24 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.cfp.muaavin.adapter.BrowsePostCustomAdapter;
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.AsyncResponsePostsDet;
+import com.cfp.muaavin.adapter.Browser_CustomAdapter;
 import com.cfp.muaavin.facebook.FacebookUtil;
+import com.cfp.muaavin.facebook.User;
 import com.cfp.muaavin.facebook.UserInterface;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.PostDetail;
 import com.cfp.muaavin.helper.AesEncryption;
-import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.twitter.TwitterUtil;
-import com.cfp.muaavin.ui.R;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,7 +55,10 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
     public UserInterface UserInterfaceDelegate = null;
     public AsyncResponsePostsDet PostDetailDelegate = null;
     public AsyncResponsePosts Postdelegate = null;
-    int total_unlikes;
+    int ItemPosition;
+    ImageButton DislikeBtn;
+    BrowsePostCustomAdapter.uIUpdate BrowsePostLayoutDelegate;
+    Browser_CustomAdapter.UiUpdate BrowseLayoutDelegate;
 
     public   WebHttpGetReq(Context c, Activity activity ,int check, AsyncResponsePosts PostDelegate, UserInterface userInterfaceDelegate)
     {
@@ -66,13 +70,15 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         this.activity = activity;
     }
 
-    public   WebHttpGetReq(Context c, int check, TextView text_view, int value)
+    public   WebHttpGetReq(Context c, int check, TextView text_view, int value, BrowsePostCustomAdapter.uIUpdate browsePostLayout, Browser_CustomAdapter.UiUpdate BrowseLayout)
     {
         context  = c;
         this.check = check;
         Dialog = new ProgressDialog(context);
         //uiUpdate = text_view;
-        total_unlikes = value;
+        ItemPosition = value;
+        BrowsePostLayoutDelegate = browsePostLayout;
+        BrowseLayoutDelegate = BrowseLayout;
     }
 
 
@@ -110,11 +116,13 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         {
             URL url = new URL(params[0]);
             //////////
+            InputStream is = null;
             HttpClient httpclient = new DefaultHttpClient();
             HttpGet httpGet= new HttpGet(params[0]);
             HttpResponse response = httpclient.execute(httpGet);
             HttpEntity entity = response.getEntity();
-            InputStream is = entity.getContent();
+            if(entity!=null)
+            is = entity.getContent();
 
             //////////
             URLConnection conn = url.openConnection();
@@ -126,12 +134,12 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
 
 
             // Get the server response
-            reader = new BufferedReader(new InputStreamReader(/*conn.getInputStream())*/is));
+            if(is!=null) { reader = new BufferedReader(new InputStreamReader(/*conn.getInputStream())*/is)); }
             StringBuilder sb = new StringBuilder();
             String line = null;
 
             // Read Server Response
-            while((line = reader.readLine()) != null){ sb.append(line + ""); }
+            if(reader!=null) while((line = reader.readLine()) != null){ sb.append(line + ""); }
             Content = sb.toString();
         }
 
@@ -152,19 +160,21 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
     else
     {
        try
-       {   Content = AesEncryption.decrypt(Content);
+       {   if((Content!=null)&&(!Content.equals(""))) Content = AesEncryption.decrypt(Content);
 
-           if((check == 0 ) || (check == 5)){
-            uiUpdate = (TextView) activity.findViewById(R.id.output);
-            uiUpdate.setText(Content);  return;
-           }
+           if((check == 0 ) || (check == 5)){ DialogBox.showErrorDialog(context,"Message",Content); return; }
+
            else if((check == 1)||(check == 9) ||(check == 7)){ getInfringingUsersDataFromDB(Content); } // check = 7 // Twitter data
 
            else if(check == 2) { getReportedPostDetailFromDB( Content); }
 
-           else if(check == 3) { }
+           else if(check == 3) { BrowseLayoutDelegate.updateDislikeButton(ItemPosition,Content); }
+
+           else if(check == 10) { BrowseLayoutDelegate.updateFeedBack(ItemPosition,Content); }
 
            else if(check == 4){ getPostsFromDB(Content); }
+
+           else if(check == 11){ BrowsePostLayoutDelegate.removeItem(ItemPosition); }
 
        } catch (JSONException e) {  e.printStackTrace(); }
          catch (Exception e) {  e.printStackTrace(); }
@@ -189,7 +199,8 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             else { FacebookBlockedUserIds.add(jsonChildNode.optString("User_ID")); }
             FrendIds.add(/*UrlHelper.getDecodedUrl(friend.profile_pic)*/friend.id);
         }
-        if((check == 1)||(check == 7)) { UserInterfaceDelegate.getReportedFriends(FrendIds); }
+        String dataType = "Twitter";
+        if((check == 1)||(check == 7)) { if(check == 1){ dataType = "Facebook";} UserInterfaceDelegate.getReportedFriends(FrendIds,dataType); }
         else if((check == 9)){  UserInterfaceDelegate.getBlockedUsers(FacebookBlockedUserIds , TwitterBlockedUserIds); }
     }
 
@@ -200,11 +211,11 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
         ArrayList<Post> Posts = new ArrayList<Post>();
         for (int i = 0; i < jsonArray.length(); i++)
         {
-            Post post = new Post();
+            Post post = new Post(); String PostUrl;
             JSONObject jsonChildNode = jsonArray.optJSONObject(i);
-            post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/"+jsonChildNode.optString("Post_ID"),0);
+            post = post.setPost(jsonChildNode.optString("Post_ID"), jsonChildNode.optString("Post_Detail"), jsonChildNode.optString("Post_Image") ,"https://www.facebook.com/",0);
             post.PostOwner.id = jsonChildNode.optString("infringingUserId");
-            if(post.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost")) {if(!TwitterUtil.BlockedUserIds.contains(post.PostOwner.id)) Posts.add(post);  };
+            if(post.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost")) {post.post_url ="https://twitter.com/"+post.PostOwner.id+"/status/"; if(!TwitterUtil.BlockedUserIds.contains(post.PostOwner.id)) Posts.add(post);  };
             if(post.IsComment = jsonChildNode.optBoolean("IsComment")){if(!FacebookUtil.BlockedUsersIds.contains(post.PostOwner.id)) Posts.add(post); };
 
         }

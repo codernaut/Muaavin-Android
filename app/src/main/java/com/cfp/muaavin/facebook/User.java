@@ -1,13 +1,11 @@
-package com.cfp.muaavin.web;
+package com.cfp.muaavin.facebook;
 
 import com.facebook.AccessToken;
 import com.facebook.Profile;
 import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.Session;
 import com.twitter.sdk.android.core.TwitterSession;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 
 public class User implements Serializable {
@@ -42,8 +40,8 @@ public class User implements Serializable {
         user.profile_pic = (profile.getProfilePictureUri(20, 20).toString());
         user.state = "UnBlocked";
         return user;
-
     }
+
     public static User getTwitterUserLoggedInInformation() {
 
         User user = new User();

@@ -1,29 +1,24 @@
-package com.cfp.muaavin.facebook;
+package com.cfp.muaavin.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.ui.BrowsePost_ListView;
-import com.cfp.muaavin.ui.FacebookLoginActivity;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
 import com.cfp.muaavin.web.WebHttpGetReq;
 
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 
 import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
@@ -31,23 +26,34 @@ import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 /**
  *
  */
-public class BrowsePostCustomAdapter extends BaseAdapter {
+public class BrowsePostCustomAdapter extends BaseAdapter  {
 
     public ArrayList<Post> Posts;
     Context context;
     private static LayoutInflater inflater=null;
     public String GroupName;
     public  String user_id;
+    ListView postListView;
+    BrowsePost_ListView BrowsePostActivity;
+    uIUpdate uiUpdate;
 
 
-    public BrowsePostCustomAdapter(BrowsePost_ListView browsePost_activity, ArrayList<Post> posts, String group_name, String userId)
+    public BrowsePostCustomAdapter(Context context,BrowsePost_ListView browsePost_activity, ArrayList<Post> posts, String group_name, String userId , ListView PostListView)
     {
         Posts  = posts;
         GroupName = group_name;
-        context = browsePost_activity;
+        this.context = context;
+        uiUpdate = browsePost_activity;
         user_id = userId;
+        postListView = PostListView;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+    }
+
+
+    public  interface uIUpdate
+    {
+        public void removeItem(int position);
     }
 
     public class Holder {
@@ -57,7 +63,6 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
         ImageView post_image;
         TextView PostHeading;
     }
-
 
     @Override
     public int getCount() {
@@ -79,7 +84,7 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
     {
 
         final Holder holder = new Holder();
-        View rowView = inflater.inflate(R.layout.browsepost_row_layout, null);//
+        final View rowView = inflater.inflate(R.layout.browsepost_row_layout, null);//
         holder.PostTextview = (TextView)rowView.findViewById(R.id.Textbox1);
         holder.PostHeading = (TextView)rowView.findViewById(R.id.Textbox2);
         holder.CrossButton = (Button)rowView.findViewById(R.id.CrossButton);
@@ -104,7 +109,7 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
                   serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/Posts_Query/DeletePosts?Post_id=" + AesEncryption.encrypt(Posts.get(position).id) + "&Group_name=" + AesEncryption.encrypt(GroupName) + "&User_id=" + AesEncryption.encrypt(user_id) +"&InfringingUserID="+AesEncryption.encrypt(Posts.get(position).PostOwner.id)+ "&isPostOfSpecificUser=" + true+"&IsTwitterPost="+Posts.get(position).IsTwitterPost+"&IsComment="+Posts.get(position).IsComment;
                 } catch (Exception e) { e.printStackTrace(); }
 
-                new WebHttpGetReq(context, 5, holder.PostTextview, 6).execute(serverURL);
+                new WebHttpGetReq(context, 11, holder.PostTextview, position,uiUpdate,null).execute(serverURL);
 
             }
         });
@@ -113,7 +118,7 @@ public class BrowsePostCustomAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                UrlHelper.showDataOnBrowser(context , Posts.get(position).post_url);
+                UrlHelper.showDataOnBrowser(context , Posts.get(position).post_url+Posts.get(position).id.split("-")[0]);
             }
         });
 

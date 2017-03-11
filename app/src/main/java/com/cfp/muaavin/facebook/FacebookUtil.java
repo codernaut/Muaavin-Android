@@ -1,15 +1,9 @@
 package com.cfp.muaavin.facebook;
 
-import android.content.Context;
-import android.os.Bundle;
-
+import com.cfp.muaavin.loaders.PostsLoadAsyncTask;
 import com.cfp.muaavin.ui.FacebookLoginActivity;
-import com.cfp.muaavin.web.User;
 import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.Profile;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -206,11 +200,11 @@ import java.util.ArrayList;
         FacebookUtil.PostIds = new ArrayList<String>();
         FacebookUtil.friendsIds = new ArrayList<String>();
         FacebookUtil.PostIdsSpecific = new ArrayList<String>();
-        LoadPostsAyscncTask.nextResultsRequests = null;
-        LoadPostsAyscncTask.count = 0;
-        LoadPostsAyscncTask.PostResponse = false;
-        LoadPostsAyscncTask.friendsIds = new ArrayList<String>();
-        LoadPostsAyscncTask.users = new ArrayList<User>();
+        PostsLoadAsyncTask.nextResultsRequests = null;
+        PostsLoadAsyncTask.count = 0;
+        PostsLoadAsyncTask.PostResponse = false;
+        PostsLoadAsyncTask.friendsIds = new ArrayList<String>();
+        PostsLoadAsyncTask.users = new ArrayList<User>();
     }
 
 }

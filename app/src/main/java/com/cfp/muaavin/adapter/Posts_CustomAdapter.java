@@ -1,10 +1,8 @@
-package com.cfp.muaavin.facebook;
+package com.cfp.muaavin.adapter;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,20 +12,15 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.cfp.muaavin.facebook.FacebookUtil;
+import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.helper.UrlHelper;
-import com.cfp.muaavin.ui.MenuActivity;
 import com.cfp.muaavin.ui.Post_ListView;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
 
-
-import org.w3c.dom.Text;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -45,19 +38,18 @@ public class Posts_CustomAdapter extends BaseAdapter {
     public String user_signed_inID;
     boolean ClipBoardOption ;
     boolean IsReportedPost = false;
+    boolean GroupPostOption ;
 
 
 
-    public Posts_CustomAdapter(Post_ListView PostList_viewActivity, ArrayList<Post> selective_posts, String user_signed_id , boolean ClipBoardOption) {
+    public Posts_CustomAdapter(Activity PostList_viewActivity, ArrayList<Post> selective_posts, String user_signed_id , boolean ClipBoardOption, boolean groupPostOption) {
 
         result = selective_posts;
         context = PostList_viewActivity;
         user_signed_inID =  user_signed_id;
         this.ClipBoardOption = ClipBoardOption;
-
-
+        GroupPostOption = groupPostOption;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
     }
 
     @Override
@@ -118,24 +110,47 @@ public class Posts_CustomAdapter extends BaseAdapter {
                 FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(removeHash(result.get(position).message,"#", " "),"'","''"), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
                 FacebookUtil.ReportPostDetail.setCommentInformation(result.get(position).Comments.get(num).comment_id,removeHash(removeHash(result.get(position).Comments.get(num).message, "#", " "),"'","''"), result.get(position).Comments.get(num).parent_comment_id,"");
 
-                if(ClipBoardOption) getInfringingUserDetail(position,num,IsReportedPost);
+                if((ClipBoardOption) ||(GroupPostOption)) getInfringingUserDetail(position,num,-1,IsReportedPost);
 
-                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,false);
+                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,null,null,false);
                 }
             });
 
             linear_layout.addView(rowTextView);
+            if((ClipBoardOption) ||(GroupPostOption))
+            {
+                for(int reply_index = 0 ; reply_index < result.get(position).Comments.get(i).replies.size(); reply_index++)
+                {
+                    final int  index = reply_index;
+                    final TextView replyTextView =  getRowTextView( result.get(position).Comments.get(num).replies.get(index).message);
+                    replyTextView.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v) {
+
+                            FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(removeHash(result.get(position).message,"#", " "),"'","''"), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
+                            FacebookUtil.ReportPostDetail.setCommentInformation(result.get(position).Comments.get(num).replies.get(index).comment_id,removeHash(removeHash(result.get(position).Comments.get(num).replies.get(index).message, "#", " "),"'","''"), result.get(position).Comments.get(num).replies.get(index).parent_comment_id,"");
+
+                            getInfringingUserDetail(position,num,index,IsReportedPost);
+
+                            DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,null,null,false);
+                        }
+                    });
+                    linear_layout.addView(replyTextView);
+                }
+            }
         }
 
-        if(ClipBoardOption)
+        if((ClipBoardOption) ||(GroupPostOption))
         holder.PostDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 IsReportedPost = true;
                 FacebookUtil.ReportPostDetail.setPostInformation(result.get(position).id,removeHash(removeHash(result.get(position).message,"#", " "),"'","''"), UrlHelper.getEncodedUrl(result.get(position).image),result.get(position).post_url);
                 FacebookUtil.ReportPostDetail.setCommentInformation(" ",removeHash(removeHash(result.get(position).message, "#", " "),"'","''"), " ","");
-                getInfringingUserDetail(position,0,IsReportedPost);
-                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,false);
+                getInfringingUserDetail(position,0,-1,IsReportedPost);
+                IsReportedPost = false;
+                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, user_signed_inID,null,null,false);
             }
         });
 
@@ -186,7 +201,7 @@ public class Posts_CustomAdapter extends BaseAdapter {
         return text;
     }
 
-    public void getInfringingUserDetail(int position,int commentIndex, boolean IsReportedPost)
+    public void getInfringingUserDetail(int position,int commentIndex,int replyIndex, boolean IsReportedPost)
     {
         if(IsReportedPost)
         {
@@ -195,12 +210,22 @@ public class Posts_CustomAdapter extends BaseAdapter {
             FacebookUtil.ReportPostDetail.infringing_user_profile_pic = result.get(position).PostOwner.profile_pic;
             FacebookUtil.ReportPostDetail.infringing_user_profile_pic = UrlHelper.getEncodedUrl(FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
             FacebookUtil.ReportPostDetail.user_state = "UnBlocked";
+
+        }
+
+        else if(replyIndex > -1)
+        {
+            FacebookUtil.ReportPostDetail.infringing_user_name = result.get(position).Comments.get(commentIndex).replies.get(replyIndex).name;
+            FacebookUtil.ReportPostDetail.infringing_user_id = result.get(position).Comments.get(commentIndex).replies.get(replyIndex).user_id;
+            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = result.get(position).Comments.get(commentIndex).replies.get(replyIndex).profilePic;
+            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = UrlHelper.getEncodedUrl(FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
+            FacebookUtil.ReportPostDetail.user_state = "UnBlocked";
         }
         else
         {
             FacebookUtil.ReportPostDetail.infringing_user_name = result.get(position).Comments.get(commentIndex).name;//MenuActivity.users.get(position).name;
             FacebookUtil.ReportPostDetail.infringing_user_id = result.get(position).Comments.get(commentIndex).user_id;
-            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = MenuActivity.users.get(commentIndex).profile_pic;
+            FacebookUtil.ReportPostDetail.infringing_user_profile_pic = result.get(position).Comments.get(commentIndex).profilePic;
             FacebookUtil.ReportPostDetail.infringing_user_profile_pic = UrlHelper.getEncodedUrl(FacebookUtil.ReportPostDetail.infringing_user_profile_pic);
             FacebookUtil.ReportPostDetail.user_state = "UnBlocked";
         }

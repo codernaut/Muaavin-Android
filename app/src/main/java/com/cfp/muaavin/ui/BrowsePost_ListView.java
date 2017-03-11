@@ -1,54 +1,64 @@
 package com.cfp.muaavin.ui;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import com.cfp.muaavin.adapter.BrowsePostCustomAdapter;
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
-import com.cfp.muaavin.facebook.AsyncResponsePostsDet;
-import com.cfp.muaavin.facebook.BrowsePostCustomAdapter;
-import com.cfp.muaavin.facebook.Browser_CustomAdapter;
 import com.cfp.muaavin.facebook.Post;
-import com.cfp.muaavin.facebook.PostDetail;
 import com.cfp.muaavin.helper.AesEncryption;
-import com.cfp.muaavin.web.User;
+import com.cfp.muaavin.facebook.User;
 import com.cfp.muaavin.web.WebHttpGetReq;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
 
-public class BrowsePost_ListView extends ActionBarActivity implements AsyncResponsePosts {
+public class BrowsePost_ListView extends Fragment implements AsyncResponsePosts ,BrowsePostCustomAdapter.uIUpdate{
 
     Context context;
     String Group_name;
     String user_id , TwitterUserId;
-
+    ArrayList<Post> Posts ;
     ListView browsePost_Listview;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.browse_post_layout);
-        context = this;
-        browsePost_Listview = (ListView)findViewById(R.id.BrowsePost_Listview);
 
-        Intent intent =  getIntent();
-        Group_name = intent.getStringExtra("Group_name");
-        user_id = intent.getStringExtra("user_id");
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)  {
+        //super.onCreate(savedInstanceState);
+        ///////////////////
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
+        //////////////////
+        //setContentView(R.layout.browse_post_layout);
+        //context = this;
+        View view  = inflater.inflate(R.layout.browse_post_layout, container, false);
+        context = getActivity();
+        browsePost_Listview = (ListView)view.findViewById(R.id.BrowsePost_Listview);
+
+        Group_name = getArguments().getString("Group_name");
+        user_id =  getArguments().getString("user_id");
         String serverURL = null;
         try {
             if(session==null) { TwitterUserId = "";  } else { TwitterUserId = String.valueOf(session.getUserId()); }
             serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/UsersPosts/GetUsersPosts?name="+ AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getLoggedInUserInformation().id)+"&isSpecificUserPost="+true+"&TwitterUserID="+AesEncryption.encrypt(TwitterUserId);
         } catch (Exception e) { e.printStackTrace(); }
 
-        new WebHttpGetReq(context,BrowsePost_ListView.this, 4,this,null).execute(serverURL);
+        new WebHttpGetReq(context,getActivity(), 4,this,null).execute(serverURL);
 
+        return view;
     }
 
 
@@ -56,9 +66,36 @@ public class BrowsePost_ListView extends ActionBarActivity implements AsyncRespo
     @Override
     public void getUserAndPostData(ArrayList<Post> result, String option) {
 
-        ArrayList<Post> Posts = new ArrayList<Post>();
-        BrowsePostCustomAdapter c = new BrowsePostCustomAdapter(BrowsePost_ListView.this, result, Group_name , User.getLoggedInUserInformation().id);
+        Posts = result;
+        BrowsePostCustomAdapter c = new BrowsePostCustomAdapter(getActivity(),this, result, Group_name , User.getLoggedInUserInformation().id,browsePost_Listview);
         browsePost_Listview.setAdapter(c);
-
     }
+
+
+    @Override
+    public void removeItem(int position) {
+        Posts.remove(position);
+        ((BaseAdapter) browsePost_Listview.getAdapter()).notifyDataSetChanged();
+    }
+
+   /* @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.layout, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_new_quote:
+                // TODO put your code here to respond to the button tap
+                LogOut();
+                Intent intent = new Intent(BrowsePost_ListView.this,FacebookLoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
+            default:  return super.onOptionsItemSelected(item);
+        }
+    }*/
 }

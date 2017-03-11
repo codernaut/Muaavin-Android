@@ -1,9 +1,10 @@
-package com.cfp.muaavin.facebook;
+package com.cfp.muaavin.adapter;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +13,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.cfp.muaavin.helper.AesEncryption;
+import com.cfp.muaavin.facebook.Comment;
+import com.cfp.muaavin.facebook.FacebookUtil;
+import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.ui.Post_ListView;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.ui.Users_ListView;
-import com.cfp.muaavin.web.DialogBox;
-import com.cfp.muaavin.web.User;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
+import com.cfp.muaavin.facebook.User;
 
-import org.w3c.dom.Text;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 /**
@@ -37,17 +35,19 @@ public class Users_CustomAdapter extends BaseAdapter {
     ArrayList<Post> User_selective_posts = new ArrayList<Post>();
     ArrayList<Post> User_posts;
     boolean IsTwitterData;
+    Activity activity;
 
     Context context;
     private static LayoutInflater inflater=null;
 
 
-    public Users_CustomAdapter(Context users_viewActivity,  ArrayList<Post> user_posts, ArrayList<User> unique_users, boolean isTwitterData) {
+    public Users_CustomAdapter(Context users_viewActivity, Activity activity, ArrayList<Post> user_posts, ArrayList<User> unique_users, boolean isTwitterData) {
 
         result=unique_users;
         context = users_viewActivity;
         User_posts = user_posts;
         IsTwitterData = isTwitterData;
+        this.activity = activity;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -91,12 +91,26 @@ public class Users_CustomAdapter extends BaseAdapter {
                 User_selective_posts = getSelectivePosts(result.get(position).id, User_posts );
 
                 boolean ClipBoardOption = false;
-                Intent intent = new Intent(context, Post_ListView.class);
+                /*Intent intent = new Intent(context, Post_ListView.class);
                 intent.putExtra("user_posts",User_selective_posts);  //User_id
                 intent.putExtra("User_id", User.getLoggedInUserInformation().id);
                 intent.putExtra("ClipBoardOption", ClipBoardOption);
+                intent.putExtra("GroupPostOption", false);
                 intent.putExtra("isTwitterData", IsTwitterData);
-                context.startActivity(intent);
+                context.startActivity(intent);*/
+                ////////////////////
+
+                Post_ListView frag = new Post_ListView();
+                Bundle args = new Bundle();
+                args.putSerializable("user_posts", User_selective_posts);
+                args.putString("User_id", User.getLoggedInUserInformation().id);
+                args.putBoolean("ClipBoardOption", ClipBoardOption);
+                args.putBoolean("GroupPostOption", false);
+                args.putBoolean("isTwitterData", IsTwitterData);
+                frag.setArguments(args);
+                FragmentManager fragmentManager = activity.getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.fragment_container, frag).addToBackStack(null).commit();
+                /////////////////////
 
             }
         });
@@ -142,8 +156,6 @@ public class Users_CustomAdapter extends BaseAdapter {
                         }
                     }
                 }
-                //comments.get(j).replies = new ArrayList<Comment>();
-
             }
         }
 
