@@ -13,5 +13,6 @@
     <string name="title_activity_highlights__list_view">Muaavin-Android</string>
     <string name="title_activity_browse_">Muaavin-Android</string>
     <string name="title_activity_browse_post__list_view">Muaavin-Android</string>
+    <string name="title_activity_groups__list_view">Groups_ListView</string>
 
 </resources>

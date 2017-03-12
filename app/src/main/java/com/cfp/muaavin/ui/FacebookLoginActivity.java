@@ -12,7 +12,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.cfp.muaavin.web.User;
+
+import com.cfp.muaavin.facebook.User;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -20,8 +21,8 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.Profile;
-import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import org.json.JSONObject;
@@ -38,6 +39,7 @@ public class FacebookLoginActivity extends ActionBarActivity  {
         String user_id;
         public static ArrayList<User> friend_list = new ArrayList<User>();
         public static User user = new User();
+        public static AccessToken userToken;
 
 
         CallbackManager callbackManager;
@@ -67,6 +69,9 @@ public class FacebookLoginActivity extends ActionBarActivity  {
                       AccessToken.setCurrentAccessToken(accessToken);
                       Profile profile = new Profile(sp.getString("ProfileId", ""), sp.getString("FirstName", ""), sp.getString("MiddleName", ""), sp.getString("LastName", ""), sp.getString("Name", ""), Uri.parse(sp.getString("Url", "")));
                       Profile.setCurrentProfile(profile);
+                      /////////
+                      //new GroupsLoadAsyncTask(context).execute(new ArrayList<Post>());
+                      ////////
                       if(!checkBox.isChecked()){ removeDataFromSharedPreferences(); }
 
                          Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
@@ -75,7 +80,7 @@ public class FacebookLoginActivity extends ActionBarActivity  {
                       }
                    else {
                         callbackManager = CallbackManager.Factory.create();
-                        LoginManager.getInstance().logInWithReadPermissions(FacebookLoginActivity.this, Arrays.asList("email", "user_status", "user_photos", "user_videos", "user_tagged_places", "user_actions.video", "user_posts", "user_friends", "public_profile", "read_page_mailboxes", "read_custom_friendlists", "user_managed_groups"));
+                        LoginManager.getInstance().logInWithReadPermissions(FacebookLoginActivity.this, Arrays.asList("email", "user_status", "user_photos", "user_videos", "user_tagged_places", "user_actions.video", "user_posts", "user_friends", "public_profile", "read_page_mailboxes", "read_custom_friendlists"));
 
                         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
@@ -86,7 +91,6 @@ public class FacebookLoginActivity extends ActionBarActivity  {
                             fetchProfile();
                             user_id = loginResult.getAccessToken().getUserId(); // 10205871243740520
                             user.id = user_id;
-
                             Toast.makeText(FacebookLoginActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
                             Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
                             intent.putExtra("User_signedID", user_id);
@@ -146,6 +150,22 @@ public class FacebookLoginActivity extends ActionBarActivity  {
         parameters.putString("fields", "id,name,link"); //write the fields you need
         request.setParameters(parameters);
         request.executeAsync();
+    }
+
+    public void getGroups()
+    {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/"+Profile.getCurrentProfile().getId()+"/groups",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                    /* handle the result */
+                        response.toString();
+                    }
+                }
+        ).executeAsync();
     }
 
     public void removeDataFromSharedPreferences()

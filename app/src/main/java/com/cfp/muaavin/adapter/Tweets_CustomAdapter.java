@@ -24,8 +24,6 @@ import java.util.ArrayList;
 public class Tweets_CustomAdapter extends BaseAdapter {
 
     ArrayList<Post> TwitterPost;
-
-
     Context context;
     private static LayoutInflater inflater=null;
     //public String[] group = {"A","B","C"};
@@ -35,8 +33,6 @@ public class Tweets_CustomAdapter extends BaseAdapter {
 
         TwitterPost = tweets;
         this.context = context;
-
-
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     }
@@ -83,7 +79,7 @@ public class Tweets_CustomAdapter extends BaseAdapter {
                 TwitterUtil.ReportTwitterDetail.infringing_user_name = TwitterPost.get(position).PostOwner.name;
                 TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic = TwitterPost.get(position).PostOwner.profile_pic;
 
-                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 0, "user_signed_inID", true);
+                DialogBox.ShowDialogBOx3(context, "Select Group ", group, 5, "user_signed_inID",null,null, true);
 
             }
         });

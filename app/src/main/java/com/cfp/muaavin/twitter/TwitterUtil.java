@@ -1,24 +1,13 @@
 package com.cfp.muaavin.twitter;
 
-import com.cfp.muaavin.facebook.Comment;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.PostDetail;
-import com.cfp.muaavin.ui.TwitterLoginActivity;
-import com.cfp.muaavin.web.User;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.Session;
-import com.twitter.sdk.android.core.TwitterException;
+import com.cfp.muaavin.facebook.User;
+import com.cfp.muaavin.loaders.TweetsLoadAsyncTask;
 import com.twitter.sdk.android.core.models.Tweet;
-import com.twitter.sdk.android.core.services.StatusesService;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import retrofit2.Call;
 
 import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
@@ -63,8 +52,8 @@ public class TwitterUtil {
     {
         Tweets = new ArrayList<Post>();
         tweetIds = new ArrayList<String>();
-        TweetsAsynchronousLoad.FollowersCursor = -1l;
-        TweetsAsynchronousLoad.maxId = 0l;
+        TweetsLoadAsyncTask.FollowersCursor = -1l;
+        TweetsLoadAsyncTask.maxId = 0l;
         Followers = new ArrayList<User>();
     }
 

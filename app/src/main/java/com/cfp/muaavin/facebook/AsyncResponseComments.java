@@ -1,7 +1,5 @@
 package com.cfp.muaavin.facebook;
 
-import com.cfp.muaavin.web.User;
-
 import java.util.ArrayList;
 
 /**

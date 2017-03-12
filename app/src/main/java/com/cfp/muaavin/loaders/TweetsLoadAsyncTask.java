@@ -1,18 +1,18 @@
-package com.cfp.muaavin.twitter;
+package com.cfp.muaavin.loaders;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import com.cfp.muaavin.facebook.Post;
-import com.cfp.muaavin.web.User;
+import com.cfp.muaavin.facebook.User;
+import com.cfp.muaavin.twitter.MyTwitterApiClient;
+import com.cfp.muaavin.twitter.TweetsAsynchronousResponse;
+import com.cfp.muaavin.twitter.TwitterUtil;
 import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.services.StatusesService;
-import com.twitter.sdk.android.core.models.*;
+
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,18 +24,17 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import com.twitter.sdk.android.core.models.*;
 
 /**
  * Created by Tooba Saeed on 04/01/2017.
  */
 
-public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, ArrayList<Post>> {
+public class TweetsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayList<Post>> {
 
     private ProgressDialog dialog;
     public Context context;
     public static ArrayList<User> users;
-    public  TwitterUtil twitterUtil = new TwitterUtil();
+    public TwitterUtil twitterUtil = new TwitterUtil();
     ArrayList<Post> Tweets = new ArrayList<Post>();
     List<Tweet> TweetsResponse;
     Call<List<Tweet>> TweetList;
@@ -43,14 +42,14 @@ public class TweetsAsynchronousLoad extends AsyncTask<ArrayList<Post> , Void, Ar
     ResponseBody responseBody;
     com.twitter.sdk.android.core.models.User user;
     public String option;
-    public static  long maxId = 0l;//804552725816086528l 816753471089209344l;
+    public static  long maxId = 0l;
 
 
 
     TweetsAsynchronousResponse TweetsDelegate;
 
 
-    public TweetsAsynchronousLoad(Context contex, TweetsAsynchronousResponse tweetsDelegate,String option)
+    public TweetsLoadAsyncTask(Context contex, TweetsAsynchronousResponse tweetsDelegate, String option)
     {
         context = contex;
         TweetsDelegate = tweetsDelegate;

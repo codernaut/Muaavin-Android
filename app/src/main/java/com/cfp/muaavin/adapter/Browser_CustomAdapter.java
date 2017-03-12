@@ -1,10 +1,7 @@
-package com.cfp.muaavin.facebook;
+package com.cfp.muaavin.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,27 +13,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.cfp.muaavin.facebook.PostDetail;
 import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.helper.UrlHelper;
 import com.cfp.muaavin.ui.Browse_Activity;
-import com.cfp.muaavin.ui.FacebookLoginActivity;
-import com.cfp.muaavin.ui.Post_ListView;
 import com.cfp.muaavin.ui.R;
-import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
 import com.cfp.muaavin.web.WebHttpGetReq;
 import com.facebook.Profile;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import static com.cfp.muaavin.ui.R.id.icon;
 
 public class Browser_CustomAdapter extends BaseAdapter {
 
@@ -46,20 +34,26 @@ public class Browser_CustomAdapter extends BaseAdapter {
     String s;
     int[] thumbValueAlreadyset;
     boolean TwitterFeedBack;
+    Browse_Activity BrowseActivityDelegate;
 
 
     private static LayoutInflater inflater=null;
 
-    public Browser_CustomAdapter(Browse_Activity browser_activity, HashMap<String, ArrayList<PostDetail>> post_details) {
+    public Browser_CustomAdapter(Context context,Browse_Activity browser_activity, HashMap<String, ArrayList<PostDetail>> post_details) {
 
         result=post_details;
-        context = browser_activity;
+        this.context = context;
+        BrowseActivityDelegate = browser_activity;
         thumbValueAlreadyset = new int[result.size()];
-
-
 
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+    }
+
+    public  interface UiUpdate
+    {
+        public void  updateDislikeButton(int position, String response);
+        public void  updateFeedBack(int position, String FeedBackMessage);
     }
 
     @Override
@@ -103,13 +97,10 @@ public class Browser_CustomAdapter extends BaseAdapter {
 
         LinearLayout linearLayout3;
 
-
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-
-
 
         View rowView;
         rowView = inflater.inflate(R.layout.browse_row_layout, null);
@@ -131,45 +122,22 @@ public class Browser_CustomAdapter extends BaseAdapter {
             new ImageSelectorAsyncTask(holder.ProfilePic, holder.connectionText).execute(infringingUserPic);
 
             String image = UrlHelper.getDecodedUrl(Post_Details.get(0).post_image);
-            LinearLayout linear_layout = (LinearLayout) rowView.findViewById(R.id.r2);
 
-            for (int i = 0; i < Post_Details .size(); i++) {
+            holder.CommentHeading.setVisibility(View.GONE);
 
-                String user_comment = Post_Details.get(i).infringing_user_name + " : " + Post_Details.get(i).comment;
+            int i = 0;
 
-                final TextView rowTextView = getRowTextView(user_comment , i);
-                ImageView image_view = getImageView();
-
-                if(!Post_Details.get(i).comment.equals(""))
-                {
-                    final RelativeLayout relative_layout = new RelativeLayout(context);
-                    linear_layout.addView(relative_layout);
-                    relative_layout.addView(rowTextView, 0);
-                    relative_layout.addView(image_view, 1);
-
-                    new ImageSelectorAsyncTask(image_view, holder.text_view).execute(infringingUserPic);
-                }
-
-                else { holder.CommentHeading.setVisibility(View.GONE);}
-
-                ////////////////////////
-                if(i==0)
-                {
-                    for(int j = 0 ; j < Post_Details.get(0).FeedBacks.size(); j++)
-                    {
-                        final RelativeLayout relative_layout = new RelativeLayout(context);
-                        ImageView PersonImage = getImageView();
-                        PersonImage.setImageResource(R.drawable.single_person_icon);
-                        final TextView TextViewFeedBack = getRowTextView(Post_Details.get(0).FeedBacks.get(j) , i);
-                        holder.linearLayout3.addView(relative_layout);
-                        relative_layout.addView(TextViewFeedBack);
-                        relative_layout.addView(PersonImage );
-                    }
-                }
-
-                ///////////////////////
-
+            for(int j = 0 ; j < Post_Details.get(0).FeedBacks.size(); j++)
+            {
+                final RelativeLayout relative_layout = new RelativeLayout(context);
+                ImageView PersonImage = getImageView();
+                PersonImage.setImageResource(R.drawable.single_person_icon);
+                final TextView TextViewFeedBack = getRowTextView(Post_Details.get(0).FeedBacks.get(j) , i);
+                holder.linearLayout3.addView(relative_layout);
+                relative_layout.addView(TextViewFeedBack);
+                relative_layout.addView(PersonImage );
             }
+
 
             new ImageSelectorAsyncTask(holder.image, holder.text_view).execute(image);
 
@@ -178,22 +146,19 @@ public class Browser_CustomAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     String comment = holder.edit_text.getText().toString();
                     String serverURL = null;
-                    try
-                    {
+
+                try {
                       if(result.get(keys.get(position)).get(0).IsTwitterPost) { TwitterFeedBack = true; }
                       serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/FeedBack/Add_FeedBack?user_id=" + AesEncryption.encrypt(Profile.getCurrentProfile().getId()) +"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+ "&post_id=" + AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id )+ "&comment=" +AesEncryption.encrypt( comment)+"&IsTwitterFeedBack="+TwitterFeedBack+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
                     } catch (Exception e) { e.printStackTrace(); }
-
-                    new WebHttpGetReq(context, -1, holder.text_view, 5).execute(serverURL);
-                    Toast.makeText(context, "Feedback Sent", Toast.LENGTH_LONG).show();
+                    new WebHttpGetReq(context, 10, holder.text_view, position,null,BrowseActivityDelegate).execute(serverURL);
                 }
             });
 
             holder.PostHeading.setOnClickListener(new View.OnClickListener() {
                 @Override
-                 public void onClick(View v) {
-
-                UrlHelper.showDataOnBrowser(context , result.get(keys.get(position)).get(0).PostUrl);
+                public void onClick(View v) {
+                    UrlHelper.showDataOnBrowser(context , result.get(keys.get(position)).get(0).PostUrl);
                 }
             });
 
@@ -209,14 +174,11 @@ public class Browser_CustomAdapter extends BaseAdapter {
                   serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/ThumbsDown/Add_ThumbsDown?user_id="+ AesEncryption.encrypt(Profile.getCurrentProfile().getId())+"&InfringingUserId="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).infringing_user_id)+"&post_id="+AesEncryption.encrypt(result.get(keys.get(position)).get(0).post_id)+"&IsTwitterPost="+result.get(keys.get(position)).get(0).IsTwitterPost+"&IsComment="+result.get(keys.get(position)).get(0).IsComment;
                 } catch (Exception e) { e.printStackTrace(); }
 
-                new WebHttpGetReq(context, 3,holder.total_unlikes,result.get(keys.get(position)).get(0).unlike_value).execute(serverURL);
-
+                new WebHttpGetReq(context, 3,holder.total_unlikes,position,null,BrowseActivityDelegate).execute(serverURL);
             }
         });
 
         return rowView;
-
-
     }
 
     public Holder getHolder(View rowView )

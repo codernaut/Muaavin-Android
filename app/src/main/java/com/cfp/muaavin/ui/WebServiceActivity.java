@@ -1,129 +1,107 @@
 package com.cfp.muaavin.ui;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.FacebookUtil;
-import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
+import com.cfp.muaavin.loaders.PostsLoadAsyncTask;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.UserInterface;
-import com.cfp.muaavin.facebook.Higlights_CustomAdapter;
-import com.cfp.muaavin.helper.AesEncryption;
+import com.cfp.muaavin.adapter.Higlights_CustomAdapter;
 import com.cfp.muaavin.twitter.TwitterUtil;
-import com.cfp.muaavin.web.FriendManagement;
-import com.cfp.muaavin.web.User;
-import com.cfp.muaavin.web.WebHttpGetReq;
-import com.twitter.sdk.android.Twitter;
-
+import com.cfp.muaavin.facebook.User;
 import java.util.ArrayList;
 
+import static com.cfp.muaavin.ui.MenuActivity.LogOut;
+import static com.cfp.muaavin.web.DialogBox.CategoryName;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
-public class WebServiceActivity extends ActionBarActivity implements UserInterface , AsyncResponsePosts {
+
+public class WebServiceActivity extends Fragment implements UserInterface , AsyncResponsePosts, UiUpdate {
 
     public Context context;
     TextView uiUpdate;
     ArrayList<User> infringing_friends;
-    ListView lv;
-    int check ;
+    ListView InfringingUserListView;
     String Group_name;
-    String serverURL = null;
     ArrayList<String> InfringingUserIds;
     Button loadUsers;
+    String DataType; View view;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_service);
-        context =     this;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //super.onCreate(savedInstanceState);
+        ///////////////////
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeButtonEnabled(true);
+        //////////////////
+        //setContentView(R.layout.activity_web_service);
+        //context =     this;
+        view  = inflater.inflate(R.layout.activity_web_service, container, false);
+        context = getActivity();
         initializeUiElements();
-        Intent mIntent = getIntent();
-        check = mIntent.getIntExtra("check", 0);
-        Group_name = mIntent.getStringExtra("Group_name");
-        loadUsers = (Button)findViewById(R.id.LoadButton);
+        Group_name = CategoryName;
+        loadUsers = (Button)view.findViewById(R.id.LoadButton);
 
-        if (check == 0)
-        {
-            getInfringingUserAndPostData();
-            loadUsers.setVisibility(View.GONE);
-        }
-        else if(check == 1)
-        {
-            try
-            {
-              User user = User.getLoggedInUserInformation();
-              serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(user.id)+"&specificUserFriends="+true;
-            } catch (Exception e) { e.printStackTrace(); }
-            new WebHttpGetReq(context,WebServiceActivity.this,  check, null, this).execute(serverURL);
-        }
+        infringing_friends = (ArrayList<User>) getArguments().getSerializable("InfringingUsers");
+        InfringingUserIds =  (ArrayList<String>) getArguments().getSerializable("InfringingUsersIds");
 
-        else if(check == 5) // Twitter Data
-        {
-            try
-            {
-              loadUsers.setVisibility(View.GONE);
-              User TwitterUser =  User.getTwitterUserLoggedInInformation();
-              serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/TweetQuery/AddTweet?User_ID="+AesEncryption.encrypt(TwitterUser.id)+"&User_Name="+AesEncryption.encrypt(TwitterUser.name)+"&User_ImageUrl="+AesEncryption.encrypt("hoiu")+"&Tweet_ID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_id)+"&Message="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_Detail)+"&ImageUrl="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_image)+"&Group_Name="+AesEncryption.encrypt(Group_name)+"&InfringingUserID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_id)+"&InfringingUserName="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_name)+"&InfringingUserProfilePic="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic);
-            } catch (Exception e) { e.printStackTrace(); }
-            new WebHttpGetReq(context,WebServiceActivity.this,check, null, this).execute(serverURL);
-        }
+        DataType = getArguments().getString("DataType");
 
-        else if(check == 7) // Twitter Data
-        {
-            try
+        if(infringing_friends.size() == 0) { uiUpdate.setText(" Currently No record found"); }
+        else { uiUpdate.setText("Group :" + Group_name); }
+        Higlights_CustomAdapter c = new Higlights_CustomAdapter(getActivity(), infringing_friends);
+        InfringingUserListView.setAdapter(c); //@+id/LoadButton
+
+        loadUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
             {
-              User TwitterUser =  User.getTwitterUserLoggedInInformation();
-              serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(TwitterUser.id)+"&specificUserFriends="+true+"&isTwitterData="+true;
-            } catch (Exception e) { e.printStackTrace(); }
-            new WebHttpGetReq(context,WebServiceActivity.this,check, null, this).execute(serverURL);
-        }
+                if(DataType.equals("Facebook"))
+                    if (PostsLoadAsyncTask.nextResultsRequests != null)
+                        new PostsLoadAsyncTask("Facebook Users",context, WebServiceActivity.this, "", false, "me", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+            }
+        });
+        return view;
     }
 
     public  void LoadUsers(View view)
     {
-        // If Facebook Post
-        new LoadPostsAyscncTask("HighlightUsers",context, WebServiceActivity.this, "", false, "", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+        if(DataType.equals("Facebook"))
+        if (PostsLoadAsyncTask.nextResultsRequests != null)
+        new PostsLoadAsyncTask("Facebook Users",context, WebServiceActivity.this, "", false, "me", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
     }
 
     @Override
-    public void getUserAndPostData(ArrayList<Post> results, String option) {
-        FacebookLoginActivity.friend_list = FacebookUtil.users;
-        check = 1;
-        getReportedFriends(InfringingUserIds);
+    public void getUserAndPostData(ArrayList<Post> results, String option) { getReportedFriends(InfringingUserIds, DataType); }
 
-    }
     @Override
-    public void getReportedFriends(ArrayList<String> Common_FriendsIds) {
+    public void getReportedFriends(ArrayList<String> InfringingUserIds, String dataType) {
 
-        InfringingUserIds = Common_FriendsIds;
-        infringing_friends = new ArrayList<User>();
+        ArrayList<User> infringing_friends = new ArrayList<User>();
         ArrayList<User> friends = FacebookLoginActivity.friend_list;
-        if(check == 7) { friends = TwitterUtil.Followers ;}
+        if(dataType.equals("Twitter")) { friends = TwitterUtil.Followers ;}
 
         for (int j = 0; j < friends.size(); j++)
         {
             String friend_id = friends.get(j).id;
-            if (Common_FriendsIds.contains(friend_id)) {  infringing_friends.add(friends.get(j)); }
+            if (InfringingUserIds.contains(friend_id)) {  infringing_friends.add(friends.get(j)); }
         }
-
-        if((check == 1) ||(check == 7))
-        {
-            if(infringing_friends.size() == 0) { uiUpdate.setText("No record found"); }
-
-            else
-            {
-                uiUpdate.setText("Group :"+Group_name);
-                Higlights_CustomAdapter c = new Higlights_CustomAdapter(WebServiceActivity.this, infringing_friends);
-                lv.setAdapter(c);
-            }
-        }
+        updateUi(infringing_friends,InfringingUserIds,dataType);
     }
 
     @Override
@@ -131,45 +109,53 @@ public class WebServiceActivity extends ActionBarActivity implements UserInterfa
 
     }
 
-    public void getInfringingUserAndPostData()
-    {
-        try
-        {
-            loadUsers.setVisibility(View.GONE);
-            User user = User.getLoggedInUserInformation();
-            String serverURL = "http://13.76.175.64:8080/Muaavin-Web/rest/posts/Insert_Post?user_name="+AesEncryption.encrypt(user.name)+"&UserState="+AesEncryption.encrypt(user.state)+"&ReportedUserState="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.user_state)+"&Post_id=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_id) + "&Group_id="+ AesEncryption.encrypt(String.valueOf(FacebookUtil.ReportPostDetail.group_id))+"&Comment_id="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.coment_id) + "&PComment_id="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.ParentComment_ID) + "&Group_name=" + AesEncryption.encrypt(Group_name) + "&Profile_name=" + AesEncryption.encrypt(user.id) + "&user_id=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_id) +  "&infringing_user_name="+ AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_name)+"&Post_image=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_image)+"&userProfilePic="+AesEncryption.encrypt(user.profile_pic)+"&infringingUser_ProfilePic=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.infringing_user_profile_pic)+"&Comment="+AesEncryption.encrypt(FacebookUtil.ReportPostDetail.comment) +"&Post_Det=" + AesEncryption.encrypt(FacebookUtil.ReportPostDetail.post_Detail) ;
-            new WebHttpGetReq(context,WebServiceActivity.this,  check,null, this).execute(serverURL);
-        }
-        catch (Exception e) { e.printStackTrace(); }
-    }
-
     public void initializeUiElements()
     {
-        uiUpdate =   (TextView) findViewById(R.id.output);
-        lv =         (ListView) findViewById(R.id.listView1);
+        uiUpdate =   (TextView) view.findViewById(R.id.output);
+        InfringingUserListView = (ListView) view.findViewById(R.id.listView1);
     }
 
-    public User  getInfringingFriend(int index)
-    {
-        User infringingFriend = new User();
-        infringingFriend.name = FacebookLoginActivity.friend_list.get(index).name;
-        infringingFriend.profile_pic = FacebookLoginActivity.friend_list.get(index).profile_pic;
-        infringingFriend.profile_url = FacebookLoginActivity.friend_list.get(index).profile_url;
-        return infringingFriend;
 
+   /* @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(getActivity().getApplicationContext(), MenuActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+    */
+    @Override
+    public void updateUi(ArrayList<User> infringing_friends, ArrayList<String> infringingUserIds,String dataType )
+    {
+        if(infringing_friends.size() > 0)
+        {
+            uiUpdate.setText("Group :"+Group_name);
+            Higlights_CustomAdapter c = new Higlights_CustomAdapter(getActivity(), infringing_friends);
+            InfringingUserListView.setAdapter(c);
+            //((BaseAdapter) InfringingUserListView.getAdapter()).notifyDataSetChanged();
+        }
+    }
+
+    /*@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.layout, menu);
+        return true;
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if(check == 7)
-        {
-            Intent intent = new Intent(getApplicationContext(), MenuActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_new_quote:
+                // TODO put your code here to respond to the button tap
+                LogOut();
+                Intent intent = new Intent(WebServiceActivity.this,FacebookLoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
+            default:  return super.onOptionsItemSelected(item);
         }
     }
-
-
+    */
 }
 

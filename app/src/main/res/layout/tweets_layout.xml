@@ -11,12 +11,12 @@
     tools:context="com.cfp.muaavin.ui.Tweet_ListView">
 
     <ListView android:id="@+id/TweetList"
-        android:layout_height="550dp"
+        android:layout_height="440dp"
         android:layout_width="fill_parent"/>
 
-    <Button android:id="@+id/LoadButton"
+    <Button android:id="@+id/LoadTweets"
         android:layout_below="@+id/TweetList"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:text="Load more Tweets"
         android:onClick="loadTweets"/>

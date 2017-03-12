@@ -1,28 +1,33 @@
     package com.cfp.muaavin.web;
 
+    import android.app.Activity;
     import android.app.AlertDialog;
+    import android.app.FragmentManager;
     import android.content.Context;
     import android.content.DialogInterface;
     import android.content.Intent;
-    import com.cfp.muaavin.facebook.AsyncResponsePosts;
-    import com.cfp.muaavin.facebook.FacebookUtil;
-    import com.cfp.muaavin.facebook.LoadPostsAyscncTask;
-    import com.cfp.muaavin.facebook.Post;
-    import com.cfp.muaavin.twitter.Controller;
+    import android.os.Bundle;
+    import android.text.InputType;
+    import android.widget.EditText;
+
+    import com.cfp.muaavin.facebook.User;
+    import com.cfp.muaavin.helper.DataLoaderHelper;
     import com.cfp.muaavin.twitter.TwitterUtil;
-    import com.cfp.muaavin.ui.BrowsePost_ListView;
-    import com.cfp.muaavin.ui.Browse_Activity;
+    import com.cfp.muaavin.ui.MenuActivity;
+    import com.cfp.muaavin.ui.R;
     import com.cfp.muaavin.ui.TwitterLoginActivity;
-    import com.cfp.muaavin.ui.WebServiceActivity;
+    import com.cfp.muaavin.ui.UiUpdate;
     import com.twitter.sdk.android.core.models.Tweet;
-    import java.util.ArrayList;
+    import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
     import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
     public class DialogBox {
 
     static String[] group  =  {"A","B","C","All"};
+    static String[] ReportOption  =  {"Report Posts","Report Tweets","Report Group Posts" };
+    public static String CategoryName;
 
-    public static void ShowDialogBOx3(final Context context , String str , final String[] category, final int option , final String user_id , final boolean isTwitterData)
+    public static void ShowDialogBOx3(final Context context , String str , final String[] category, final int option , final String user_id ,final Activity activity, final UiUpdate uiUpdate, final boolean isTwitterData)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(str);
@@ -31,64 +36,25 @@
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                String group_name = group[which];
-                if(isTwitterData)
-                {
-                    TwitterUtil.ReportTwitterDetail.group_id = which + 1;
+                String dataType = "Facebook";
+                String group_name = group[which]; CategoryName = category[which];
+                DataLoaderHelper dataLoader = new DataLoaderHelper(context,uiUpdate,activity);
+                if(isTwitterData) dataType = "Twitter";
+                try {
+                      dataLoader.loadReportedUsersFromDB(dataType,group_name,which,option,activity, uiUpdate);
+                    } catch (Exception e) { e.printStackTrace(); }
 
-                    if(option == 7)
-                    {
-                        Intent intent = new Intent(context, WebServiceActivity.class);
-                        intent.putExtra("Group_name", group_name);
-                        intent.putExtra("check", option);
-                        context.startActivity(intent);
-                    }
-                    else
-                    {
-                        Intent intent = new Intent(context, WebServiceActivity.class);
-                        intent.putExtra("Group_name", group_name);
-                        intent.putExtra("check", 5);
-                        context.startActivity(intent);
-                    }
-                }
-                else {
-                    FacebookUtil.ReportPostDetail.group_id = which + 1;
-
-                    if (option == 0) {
-                        Intent intent = new Intent(context, WebServiceActivity.class);
-                        intent.putExtra("Group_name", group_name);
-                        intent.putExtra("check", option);
-                        context.startActivity(intent);
-                    } else if (option == 1) {
-
-                        Intent intent = new Intent(context, WebServiceActivity.class);
-                        intent.putExtra("Group_name", group_name);
-                        intent.putExtra("check", option);
-                        context.startActivity(intent);
-
-                    } else if (option == 2) {
-                        Intent intent = new Intent(context, Browse_Activity.class);
-                        intent.putExtra("Group_name", group_name);
-                        context.startActivity(intent);
-                    } else if (option == 4) {
-
-                        Intent intent = new Intent(context, BrowsePost_ListView.class);
-                        intent.putExtra("Group_name", group_name);
-                        intent.putExtra("user_id", user_id);
-                        context.startActivity(intent);
-                    }
-                }
             }
         });
         builder.show();
     }
 
-        public static  void showErrorDialog(Context context )
+        public static  void showErrorDialog(Context context, String heading, String Text )
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle(" Error");
+            builder.setTitle(heading);
 
-            builder.setMessage("Permission Error");
+            builder.setMessage(Text);
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int id) {
@@ -99,7 +65,7 @@
 
         }
 
-        public static  void showQuestionDialog(final Context context,final AsyncResponsePosts delegate, final String user_id, final  String post_id, final String link, final boolean IsFacebookPost)
+        public static  void showQuestionDialog(final Context context,final Activity activity, final String user_id, final  String post_id, final String link, final boolean IsFacebookPost)
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(" Link");
@@ -111,17 +77,22 @@
 
                     if(IsFacebookPost) {
                         boolean isClipboardData = true;
-                        FacebookUtil.users = new ArrayList<User>();
-                        FacebookUtil.friendsIds = new ArrayList<String>();
-                        LoadPostsAyscncTask.count = 0;
-                        new LoadPostsAyscncTask("ReportUsers",context, delegate, user_id, isClipboardData, post_id, new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
+                        clearFacebookData();
+                        DataLoaderHelper controller = new DataLoaderHelper(context,null,activity);
+                        controller.loadFacebookPosts("Clipboard Posts",post_id,true);
                     }
 
-                    else {  if(session == null)
-                    {
-                        Intent intent = new Intent(context, TwitterLoginActivity.class);
-                        intent.putExtra("option", "Load Specific Tweet"); context.startActivity(intent);
-                    }    else {Controller controller = new Controller(context); controller.loadTwitterData("Load Specific Tweet"); }}
+                    else
+                    {  if(session == null)
+                        {
+                            /*Intent intent = new Intent(context, TwitterLoginActivity.class);
+                            intent.putExtra("option", "Load Specific Tweet"); context.startActivity(intent);*/
+                            TwitterLoginActivity twitterFragment = new TwitterLoginActivity();
+                            Bundle args = new Bundle(); args.putString("option", "Load Specific Tweet"); twitterFragment.setArguments(args);
+                            FragmentManager fragmentManager = activity.getFragmentManager();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment,"TwitterFragment").commit();
+                        }   else {DataLoaderHelper controller = new DataLoaderHelper(context,null,activity); controller.loadTwitterData("Load Specific Tweet"); }
+                    }
                 }
             });
             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -134,7 +105,7 @@
             builder.show();
         }
 
-        public static  void showTweetDialog(final Context context,final Tweet tweet  )
+        public static  void showTweetDialog(final Context context, final Activity activity, final Tweet tweet  )
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(" Tweet");
@@ -150,18 +121,16 @@
                     builder.setItems(group, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            TwitterUtil.ReportTwitterDetail.infringing_user_name = tweet.user.name;
-                            TwitterUtil.ReportTwitterDetail.infringing_user_id= tweet.user.idStr;
-                            TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic = tweet.user.profileImageUrl;
-                            TwitterUtil.ReportTwitterDetail.post_Detail = tweet.text;
-                            TwitterUtil.ReportTwitterDetail.post_id = tweet.idStr;
-                            String group_name = group[i];
-                            Intent intent = new Intent(context, WebServiceActivity.class);
-                            intent.putExtra("Group_name", group_name);
-                            intent.putExtra("check", 5);
-                            context.startActivity(intent);
-
-
+                        TwitterUtil.ReportTwitterDetail.infringing_user_name = tweet.user.name;
+                        TwitterUtil.ReportTwitterDetail.infringing_user_id= tweet.user.idStr;
+                        TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic = tweet.user.profileImageUrl;
+                        TwitterUtil.ReportTwitterDetail.post_Detail = tweet.text;
+                        TwitterUtil.ReportTwitterDetail.post_id = tweet.idStr;
+                        String group_name = group[i];
+                        DataLoaderHelper dataLoader = new DataLoaderHelper(context,null,activity);
+                        try {
+                          dataLoader.loadReportedUsersFromDB("Twitter",group_name,i,5,null,null);
+                        } catch (Exception e) {  e.printStackTrace(); }
                         }
                     }).show();
 
@@ -176,5 +145,96 @@
             builder.show();
 
         }
+
+        public static void promptInputDialog(final  Context context, final Activity activity )
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Enter Group Name");
+            // Set up the input
+            final EditText input = new EditText(context);
+            // Specify the type of input expected
+            input.setInputType(InputType.TYPE_CLASS_TEXT );
+            builder.setView(input);
+            // Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    DataLoaderHelper controller = new DataLoaderHelper(context,null,activity);
+                    controller.loadFacebookGroups(input.getText().toString());
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        }
+
+        public static void SelectReportOption(final Context context , String str , final String[] category, final int option , final String user_id ,final Activity activity, final UiUpdate uiUpdate, final boolean isTwitterData)
+        {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(str);
+
+            builder.setItems(category, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    if (User.user_authentication == false) {  return; }
+
+                    if(category[which].equals("Report Posts")) {
+                        FriendManagement friend_management = new FriendManagement();
+                        friend_management.reportFriends(context, activity);
+                    }
+
+                    if(category[which].equals("Report Tweets")) {
+
+                        if (session == null) {
+                            TwitterLoginActivity twitterFragment = new TwitterLoginActivity();
+                            Bundle args = new Bundle(); args.putString("option", "LoadTweets");
+                            twitterFragment.setArguments(args);
+                            FragmentManager fragmentManager = activity.getFragmentManager();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment, "TwitterFragment").addToBackStack(null).commit();
+                        }
+                        else { DataLoaderHelper dataHandler = new DataLoaderHelper(context, uiUpdate, activity); dataHandler.loadTwitterData("LoadTweets"); }
+                    }
+                    else if(category[which].equals("Report Group Posts"))
+                    {
+                        promptInputDialog(context,activity);
+                    }
+                    else if(category[which].equals("Highlight Facebook Users"))
+                    {
+                       FriendManagement friend_management = new FriendManagement();
+                       friend_management.Highlights(context,uiUpdate,activity);
+                    }
+
+                    else if(category[which].equals("Highlight Twitter Users"))
+                    {
+                        if(session == null)
+                        {
+                            TwitterLoginActivity twitterFragment = new TwitterLoginActivity();
+                            Bundle args = new Bundle(); args.putString("option", "LoadFollowers"); twitterFragment.setArguments(args);
+                            FragmentManager fragmentManager = activity.getFragmentManager();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment,"TwitterFragment").commit();
+                        } else { DataLoaderHelper dataHandler = new DataLoaderHelper(context, uiUpdate, activity); dataHandler.loadTwitterData( "LoadFollowers"); }
+                    }
+
+                    else if(category[which].equals("Browse Reports"))
+                    {
+                        FriendManagement friend_management = new FriendManagement(); friend_management.Browse(context,activity);
+                    }
+
+                    else if(category[which].equals("Browse Posts"))
+                    {
+                        FriendManagement friend_management = new FriendManagement(); friend_management.BrowsePost(context,user_id,activity);
+                    }
+                }
+            });
+            builder.show();
+        }
+
+
 
 }

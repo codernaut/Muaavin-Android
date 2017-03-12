@@ -39,7 +39,7 @@ public class UrlHelper {
     public static void showDataOnBrowser(Context context ,String url)
     {
         try{
-            context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
+          context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
         } catch (PackageManager.NameNotFoundException e){
             e.printStackTrace();
         }

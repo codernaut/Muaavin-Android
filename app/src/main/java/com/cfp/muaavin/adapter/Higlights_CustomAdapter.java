@@ -1,5 +1,6 @@
-package com.cfp.muaavin.facebook;
+package com.cfp.muaavin.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,7 +16,7 @@ import android.widget.TextView;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.ui.WebServiceActivity;
 import com.cfp.muaavin.web.ImageSelectorAsyncTask;
-import com.cfp.muaavin.web.User;
+import com.cfp.muaavin.facebook.User;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class Higlights_CustomAdapter extends BaseAdapter {
 
 
 
-    public Higlights_CustomAdapter(WebServiceActivity webActivity,  ArrayList<User> infringing_friends) {
+    public Higlights_CustomAdapter(Activity webActivity, ArrayList<User> infringing_friends) {
 
 
         context = webActivity;

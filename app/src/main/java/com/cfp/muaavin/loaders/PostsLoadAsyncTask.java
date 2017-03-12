@@ -1,28 +1,26 @@
-package com.cfp.muaavin.facebook;
+package com.cfp.muaavin.loaders;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ListView;
 
-import com.cfp.muaavin.ui.FacebookLoginActivity;
-import com.cfp.muaavin.ui.MenuActivity;
-import com.cfp.muaavin.web.User;
+import com.cfp.muaavin.facebook.AsyncResponsePosts;
+import com.cfp.muaavin.facebook.Comment;
+import com.cfp.muaavin.facebook.FacebookUtil;
+import com.cfp.muaavin.facebook.Post;
+import com.cfp.muaavin.facebook.User;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, ArrayList<Post>> {
+public class PostsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayList<Post>> {
 
     public static FacebookUtil facebookUtil = new FacebookUtil();
     ArrayList<Post> Posts;
@@ -43,7 +41,7 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
     String Option;
 
 
-    public LoadPostsAyscncTask(String option, Context context, AsyncResponsePosts delegate , /*ListView listView,*/  String user_id, boolean isClipboardData, String post_id, ArrayList<Post> Posts, ArrayList<User> users) {
+    public PostsLoadAsyncTask(String option, Context context, AsyncResponsePosts delegate , String user_id, boolean isClipboardData, String post_id, ArrayList<Post> Posts, ArrayList<User> users) {
 
         this.delegate = delegate;
         userId = user_id;
@@ -94,13 +92,12 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
 
     public ArrayList<Post> getAllPosts(final ArrayList<Post> posts)
     {
-        // 10205871243740520
         if(count == 0) {
             Bundle params = new Bundle();
-
-            params.putString("fields", "message,full_picture,story,created_time,picture,comments.summary(true){from{id,name,picture},id,message,comments{from{id,name,picture},id,message}}");//,comments.summary(true)
+            params.putString("limit","10");
+            params.putString("fields", "from{id,name,picture},message,full_picture,story,created_time,picture,comments.summary(true){from{id,name,picture},id,message,comments{from{id,name,picture},id,message}}");//,comments.summary(true)
             new GraphRequest(AccessToken.getCurrentAccessToken(),
-            "/me/feed",
+            "/"+Post_ID+"/feed",
             params,
             HttpMethod.GET,
             new GraphRequest.Callback() {
@@ -168,20 +165,22 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
         final  int post_index = postID;
         if(Posts.get(post_index).comment_count >  0)
         {
-            getGraphApiComments(Posts.get(post_index).id, -1, post_index,  true);
+            getGraphApiComments(Posts.get(post_index).id, -1, post_index, true);
             comments = Posts.get(post_index).Comments;
-        }
 
-        for(int j = 0; j < comments.size(); j++ )
-        {
-            final int comment_index = j;
-            final String CommentID = comments.get(j).comment_id;
-            if(comments.get(comment_index).reply_count > 0){ getGraphApiComments(CommentID, comment_index, post_index,  false); }
+            for (int j = 0; j < comments.size(); j++)
+            {
+                final int comment_index = j;
+                final String CommentID = comments.get(j).comment_id;
+                if (comments.get(comment_index).reply_count > 0)
+                {
+                    getGraphApiComments(CommentID, comment_index, post_index, false);
+                }
+            }
         }
 
        }
     }
-
 
     public  ArrayList<Comment> getJsonComments(ArrayList<Comment> coments,GraphResponse response, String post_id ,String parent_CommentID, int isReply)
     {
@@ -199,8 +198,8 @@ public class LoadPostsAyscncTask extends AsyncTask<ArrayList<Post> , Void, Array
             if(replies!=null)
             if(replies.has("summary")) {comment.reply_count = replies.optJSONObject("summary").optInt("total_count");}
 
-            if(isReply == 1){ comment.setComment(obj.optString("id"),parent_CommentID , from.optString("name"),post_id ,from.optString("id") , obj.optString("message"), 0 ); }
-            else { comment.setComment(obj.optString("id"),parent_CommentID , from.optString("name"),post_id ,from.optString("id") , obj.optString("message"),comment.reply_count ); }
+            if(isReply == 1){ comment.setComment(obj.optString("id"),parent_CommentID , from.optString("name"),post_id ,from.optString("id") ,from.optJSONObject("picture").optJSONObject("data").optString("url"), obj.optString("message"), 0 ); }
+            else { comment.setComment(obj.optString("id"),parent_CommentID , from.optString("name"),post_id ,from.optString("id") ,from.optJSONObject("picture").optJSONObject("data").optString("url"), obj.optString("message"),comment.reply_count ); }
 
             if(!friendsIds.contains(comment.user_id)&&(!comment.user_id.equals(userId))&&(!FacebookUtil.BlockedUsersIds.contains(comment.user_id)))
             {
