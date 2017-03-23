@@ -1,5 +1,6 @@
 package com.cfp.muaavin.facebook;
 
+import com.cfp.muaavin.twitter.TwitterUtil;
 import com.facebook.AccessToken;
 import com.facebook.Profile;
 import com.twitter.sdk.android.Twitter;
@@ -31,9 +32,7 @@ public class User implements Serializable {
     }
 
     public static User getLoggedInUserInformation() {
-
         User user = new User();
-
         Profile profile = Profile.getCurrentProfile();
         user.id = AccessToken.getCurrentAccessToken().getUserId();
         user.name = profile.getName();
@@ -43,13 +42,12 @@ public class User implements Serializable {
     }
 
     public static User getTwitterUserLoggedInInformation() {
-
         User user = new User();
-        TwitterSession session = Twitter.getSessionManager().getActiveSession();
-        user.id = String.valueOf(session.getUserId());
-        user.name = String.valueOf(session.getUserName());
+        user.id =   TwitterUtil.user.id;
+        user.name = TwitterUtil.user.name;
         user.state = "unBlocked";
-        user.profile_pic = "fyfhgh";
+        user.profile_pic = TwitterUtil.user.profile_pic;
+        user.profile_url = TwitterUtil.user.profile_url;
         return user;
 
     }

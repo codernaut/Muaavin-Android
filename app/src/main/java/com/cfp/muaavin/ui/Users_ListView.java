@@ -22,8 +22,6 @@ import com.cfp.muaavin.adapter.Users_CustomAdapter;
 import com.cfp.muaavin.facebook.User;
 import java.util.ArrayList;
 
-import static com.cfp.muaavin.ui.MenuActivity.LogOut;
-
 
 public class Users_ListView extends Fragment implements AsyncResponsePosts{
 
@@ -36,13 +34,7 @@ public class Users_ListView extends Fragment implements AsyncResponsePosts{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-                                 {
-        //super.onCreate(savedInstanceState);
-        ///////////////////
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeButtonEnabled(true);
-        //////////////////
-        //setContentView(R.layout.users);
+    {
         View view  = inflater.inflate(R.layout.users, container, false);
         context = getActivity();
         UserListView = (ListView) view.findViewById(R.id.listView2);
@@ -75,25 +67,4 @@ public class Users_ListView extends Fragment implements AsyncResponsePosts{
         new PostsLoadAsyncTask("ReportUsers",context, Users_ListView.this, User.getLoggedInUserInformation().id, isClipboardData, "me", new ArrayList<Post>(), new ArrayList<User>()).execute(new ArrayList<Post>());
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.layout, menu);
-        return true;
-    }*/
-
-   /* @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_new_quote:
-                // TODO put your code here to respond to the button tap
-                LogOut();
-                Intent intent = new Intent(Users_ListView.this,FacebookLoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-
-            default:  return super.onOptionsItemSelected(item);
-        }
-    }
-*/
 }

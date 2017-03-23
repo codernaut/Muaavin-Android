@@ -14,13 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-
 import com.cfp.muaavin.adapter.GroupsAdapter;
 import com.cfp.muaavin.facebook.Group;
-
 import java.util.ArrayList;
-
-import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 
 public class GroupsListView extends Fragment {
 

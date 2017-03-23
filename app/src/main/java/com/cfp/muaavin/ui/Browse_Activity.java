@@ -2,13 +2,8 @@ package com.cfp.muaavin.ui;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -21,7 +16,6 @@ import com.cfp.muaavin.web.WebHttpGetReq;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 
 
 public class Browse_Activity extends Fragment implements AsyncResponsePostsDet,Browser_CustomAdapter.UiUpdate {

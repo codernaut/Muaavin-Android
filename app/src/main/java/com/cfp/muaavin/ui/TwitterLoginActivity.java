@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,14 +42,9 @@ public class TwitterLoginActivity extends Fragment implements UiUpdate{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
-        //TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
-        //Fabric.with(getActivity(), new Twitter(authConfig));
-        //setContentView(R.layout.twitter_login_screen);
-        //////////
+
         View view  = inflater.inflate(R.layout.twitter_login_screen, container, false);
         context = getActivity();
-        //////
         option = getArguments().getString("option");
         controller = new DataLoaderHelper(context,this,getActivity());
 

@@ -24,7 +24,7 @@ public class ClipBoardHelper {
     {
         boolean IsFacebookPost = false;
         clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("url", "https://m.facebook.com/story.php?story_fbid=1608279239485001&id=100009088212554");
+        ClipData clip = ClipData.newPlainText("url", "https://m.facebook.com/story.php?story_fbid=10154624315373451&id=325342768450");
         clipboard.setPrimaryClip(clip);
 
         String ClipboardData = "";///https://twitter.com/Asad_Umar/status/828527999951761408

@@ -217,7 +217,6 @@ public class WebHttpGetReq extends AsyncTask<String, Void, Void> {
             post.PostOwner.id = jsonChildNode.optString("infringingUserId");
             if(post.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost")) {post.post_url ="https://twitter.com/"+post.PostOwner.id+"/status/"; if(!TwitterUtil.BlockedUserIds.contains(post.PostOwner.id)) Posts.add(post);  };
             if(post.IsComment = jsonChildNode.optBoolean("IsComment")){if(!FacebookUtil.BlockedUsersIds.contains(post.PostOwner.id)) Posts.add(post); };
-
         }
         Postdelegate.getUserAndPostData(Posts,"BrowsePosts");
     }

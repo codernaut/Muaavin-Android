@@ -18,7 +18,6 @@ public class FriendManagement  {
     DataLoaderHelper controller;
 
 
-
     public void Highlights(Context context , UiUpdate uiUpdate, Activity activity)
     {
         this.context = context;

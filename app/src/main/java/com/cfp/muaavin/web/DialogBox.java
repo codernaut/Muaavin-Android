@@ -1,30 +1,28 @@
-    package com.cfp.muaavin.web;
+package com.cfp.muaavin.web;
 
-    import android.app.Activity;
-    import android.app.AlertDialog;
-    import android.app.FragmentManager;
-    import android.content.Context;
-    import android.content.DialogInterface;
-    import android.content.Intent;
-    import android.os.Bundle;
-    import android.text.InputType;
-    import android.widget.EditText;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.FragmentManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.text.InputType;
+import android.widget.EditText;
+import com.cfp.muaavin.facebook.User;
+import com.cfp.muaavin.helper.DataLoaderHelper;
+import com.cfp.muaavin.twitter.TwitterUtil;
+import com.cfp.muaavin.ui.R;
+import com.cfp.muaavin.ui.TwitterLoginActivity;
+import com.cfp.muaavin.ui.UiUpdate;
+import com.twitter.sdk.android.core.models.Tweet;
+import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
+import static com.cfp.muaavin.twitter.TwitterUtil.clearTwitterData;
+import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
-    import com.cfp.muaavin.facebook.User;
-    import com.cfp.muaavin.helper.DataLoaderHelper;
-    import com.cfp.muaavin.twitter.TwitterUtil;
-    import com.cfp.muaavin.ui.MenuActivity;
-    import com.cfp.muaavin.ui.R;
-    import com.cfp.muaavin.ui.TwitterLoginActivity;
-    import com.cfp.muaavin.ui.UiUpdate;
-    import com.twitter.sdk.android.core.models.Tweet;
-    import static com.cfp.muaavin.facebook.FacebookUtil.clearFacebookData;
-    import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
-
-    public class DialogBox {
+public class DialogBox {
 
     static String[] group  =  {"A","B","C","All"};
-    static String[] ReportOption  =  {"Report Posts","Report Tweets","Report Group Posts" };
+    static String[] categories  =  new String[]{"Sexual harassment", "Incitement to violence","Trans rights"};
     public static String CategoryName;
 
     public static void ShowDialogBOx3(final Context context , String str , final String[] category, final int option , final String user_id ,final Activity activity, final UiUpdate uiUpdate, final boolean isTwitterData)
@@ -85,12 +83,10 @@
                     else
                     {  if(session == null)
                         {
-                            /*Intent intent = new Intent(context, TwitterLoginActivity.class);
-                            intent.putExtra("option", "Load Specific Tweet"); context.startActivity(intent);*/
                             TwitterLoginActivity twitterFragment = new TwitterLoginActivity();
                             Bundle args = new Bundle(); args.putString("option", "Load Specific Tweet"); twitterFragment.setArguments(args);
                             FragmentManager fragmentManager = activity.getFragmentManager();
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment,"TwitterFragment").commit();
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment,"TwitterFragment").addToBackStack(null).commit();
                         }   else {DataLoaderHelper controller = new DataLoaderHelper(context,null,activity); controller.loadTwitterData("Load Specific Tweet"); }
                     }
                 }
@@ -118,7 +114,7 @@
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder.setTitle("Group name"); final String[] group = {"A","B","C"};
 
-                    builder.setItems(group, new DialogInterface.OnClickListener() {
+                    builder.setItems(categories, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                         TwitterUtil.ReportTwitterDetail.infringing_user_name = tweet.user.name;
@@ -182,6 +178,9 @@
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
+                    for(int i = 0 ; i < activity.getFragmentManager().getBackStackEntryCount() ; i++ )
+                        activity.getFragmentManager().popBackStack();
+
                     if (User.user_authentication == false) {  return; }
 
                     if(category[which].equals("Report Posts")) {
@@ -189,7 +188,7 @@
                         friend_management.reportFriends(context, activity);
                     }
 
-                    if(category[which].equals("Report Tweets")) {
+                    else if(category[which].equals("Report Tweets")) {
 
                         if (session == null) {
                             TwitterLoginActivity twitterFragment = new TwitterLoginActivity();
@@ -198,7 +197,7 @@
                             FragmentManager fragmentManager = activity.getFragmentManager();
                             fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment, "TwitterFragment").addToBackStack(null).commit();
                         }
-                        else { DataLoaderHelper dataHandler = new DataLoaderHelper(context, uiUpdate, activity); dataHandler.loadTwitterData("LoadTweets"); }
+                        else { clearTwitterData(); DataLoaderHelper dataHandler = new DataLoaderHelper(context, uiUpdate, activity); dataHandler.loadTwitterData("LoadTweets"); }
                     }
                     else if(category[which].equals("Report Group Posts"))
                     {
@@ -217,8 +216,8 @@
                             TwitterLoginActivity twitterFragment = new TwitterLoginActivity();
                             Bundle args = new Bundle(); args.putString("option", "LoadFollowers"); twitterFragment.setArguments(args);
                             FragmentManager fragmentManager = activity.getFragmentManager();
-                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment,"TwitterFragment").commit();
-                        } else { DataLoaderHelper dataHandler = new DataLoaderHelper(context, uiUpdate, activity); dataHandler.loadTwitterData( "LoadFollowers"); }
+                            fragmentManager.beginTransaction().replace(R.id.fragment_container, twitterFragment,"TwitterFragment").addToBackStack(null).commit();
+                        } else { clearTwitterData(); DataLoaderHelper dataHandler = new DataLoaderHelper(context, uiUpdate, activity); dataHandler.loadTwitterData( "LoadFollowers"); }
                     }
 
                     else if(category[which].equals("Browse Reports"))

@@ -18,8 +18,12 @@
         android:layout_below="@+id/Textbox1"
         android:layout_centerInParent="true"/>
 
-    <TextView android:text=" Comments :" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:id="@+id/Textbox3" android:textSize="20dp"
+    <TextView
+        android:text=" Comments :"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/CommentHeading"
+        android:textSize="20dp"
         android:background="#3b5998" android:textColor="#ffffff"
         android:layout_below="@+id/Image_view"/>
 
@@ -29,7 +33,7 @@
         android:layout_width="match_parent"
         android:id="@+id/r2"
         android:orientation="vertical"
-        android:layout_below="@+id/Textbox3"
+        android:layout_below="@+id/CommentHeading"
 
         />
 

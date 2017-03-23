@@ -227,12 +227,9 @@ public class Browser_CustomAdapter extends BaseAdapter {
 
     public ImageView getImageView()
     {
-
         ImageView image_view = new ImageView(context);
         image_view.setLayoutParams(getRelativeLayoutParams());
-
         return image_view;
-
     }
 
     // Get Layout for Image View

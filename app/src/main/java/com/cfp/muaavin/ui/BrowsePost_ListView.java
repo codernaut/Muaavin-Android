@@ -20,10 +20,7 @@ import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.helper.AesEncryption;
 import com.cfp.muaavin.facebook.User;
 import com.cfp.muaavin.web.WebHttpGetReq;
-
 import java.util.ArrayList;
-
-import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 import static com.cfp.muaavin.ui.TwitterLoginActivity.session;
 
 
@@ -37,13 +34,7 @@ public class BrowsePost_ListView extends Fragment implements AsyncResponsePosts 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)  {
-        //super.onCreate(savedInstanceState);
-        ///////////////////
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeButtonEnabled(true);
-        //////////////////
-        //setContentView(R.layout.browse_post_layout);
-        //context = this;
+
         View view  = inflater.inflate(R.layout.browse_post_layout, container, false);
         context = getActivity();
         browsePost_Listview = (ListView)view.findViewById(R.id.BrowsePost_Listview);
@@ -77,25 +68,5 @@ public class BrowsePost_ListView extends Fragment implements AsyncResponsePosts 
         Posts.remove(position);
         ((BaseAdapter) browsePost_Listview.getAdapter()).notifyDataSetChanged();
     }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.layout, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_new_quote:
-                // TODO put your code here to respond to the button tap
-                LogOut();
-                Intent intent = new Intent(BrowsePost_ListView.this,FacebookLoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-
-            default:  return super.onOptionsItemSelected(item);
-        }
-    }*/
+    
 }

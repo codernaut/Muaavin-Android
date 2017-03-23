@@ -24,8 +24,6 @@ import com.cfp.muaavin.adapter.Higlights_CustomAdapter;
 import com.cfp.muaavin.twitter.TwitterUtil;
 import com.cfp.muaavin.facebook.User;
 import java.util.ArrayList;
-
-import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 import static com.cfp.muaavin.web.DialogBox.CategoryName;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -44,13 +42,7 @@ public class WebServiceActivity extends Fragment implements UserInterface , Asyn
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
-        ///////////////////
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeButtonEnabled(true);
-        //////////////////
-        //setContentView(R.layout.activity_web_service);
-        //context =     this;
+
         view  = inflater.inflate(R.layout.activity_web_service, container, false);
         context = getActivity();
         initializeUiElements();
@@ -115,15 +107,6 @@ public class WebServiceActivity extends Fragment implements UserInterface , Asyn
         InfringingUserListView = (ListView) view.findViewById(R.id.listView1);
     }
 
-
-   /* @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(getActivity().getApplicationContext(), MenuActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-    */
     @Override
     public void updateUi(ArrayList<User> infringing_friends, ArrayList<String> infringingUserIds,String dataType )
     {
@@ -135,27 +118,5 @@ public class WebServiceActivity extends Fragment implements UserInterface , Asyn
             //((BaseAdapter) InfringingUserListView.getAdapter()).notifyDataSetChanged();
         }
     }
-
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.layout, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_new_quote:
-                // TODO put your code here to respond to the button tap
-                LogOut();
-                Intent intent = new Intent(WebServiceActivity.this,FacebookLoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-
-            default:  return super.onOptionsItemSelected(item);
-        }
-    }
-    */
 }
 

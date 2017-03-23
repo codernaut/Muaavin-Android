@@ -91,14 +91,6 @@ public class Users_CustomAdapter extends BaseAdapter {
                 User_selective_posts = getSelectivePosts(result.get(position).id, User_posts );
 
                 boolean ClipBoardOption = false;
-                /*Intent intent = new Intent(context, Post_ListView.class);
-                intent.putExtra("user_posts",User_selective_posts);  //User_id
-                intent.putExtra("User_id", User.getLoggedInUserInformation().id);
-                intent.putExtra("ClipBoardOption", ClipBoardOption);
-                intent.putExtra("GroupPostOption", false);
-                intent.putExtra("isTwitterData", IsTwitterData);
-                context.startActivity(intent);*/
-                ////////////////////
 
                 Post_ListView frag = new Post_ListView();
                 Bundle args = new Bundle();
@@ -110,8 +102,6 @@ public class Users_CustomAdapter extends BaseAdapter {
                 frag.setArguments(args);
                 FragmentManager fragmentManager = activity.getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.fragment_container, frag).addToBackStack(null).commit();
-                /////////////////////
-
             }
         });
         return rowView;
@@ -192,7 +182,6 @@ public class Users_CustomAdapter extends BaseAdapter {
 
     public Holder getHolder( View rowView)
     {
-
         Holder holder=new Holder();
         holder.tv1=(TextView) rowView.findViewById(R.id.Textbox1);
         holder.img=(ImageView) rowView.findViewById(R.id.Image_view);

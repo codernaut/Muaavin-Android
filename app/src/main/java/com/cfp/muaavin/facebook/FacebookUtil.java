@@ -1,9 +1,16 @@
 package com.cfp.muaavin.facebook;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.cfp.muaavin.helper.SharedPreferenceHelper;
 import com.cfp.muaavin.loaders.PostsLoadAsyncTask;
 import com.cfp.muaavin.ui.FacebookLoginActivity;
 import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,15 +75,15 @@ import java.util.ArrayList;
         if(jsonChildNode.has("infringingUserId")) { PostDetailObj.infringing_user_id = jsonChildNode.optString("infringingUserId"); }
         if(jsonChildNode.has("infringingUser_ProfilePic")) { PostDetailObj.infringing_user_profile_pic = jsonChildNode.optString("infringingUser_ProfilePic"); }
         if(jsonChildNode.has("CommentID")) { PostDetailObj.coment_id = jsonChildNode.optString("CommentID"); }
-        //if(jsonChildNode.has("Comment")) { PostDetailObj.comment = jsonChildNode.optString("Comment"); }
         if(jsonChildNode.has("Post_ID")) { PostDetailObj.post_id = jsonChildNode.optString("Post_ID"); }
-        //if(jsonChildNode.has("Post_ID")) { PostDetailObj.PostUrl = "https://www.facebook.com/" + PostDetailObj.post_id; }
         if(jsonChildNode.has("Post_Detail")) { PostDetailObj.post_Detail = jsonChildNode.optString("Post_Detail"); }
         if(jsonChildNode.has("Post_Image")) { PostDetailObj.post_image = jsonChildNode.optString("Post_Image"); }
         if(jsonChildNode.has("unlike_value")) { PostDetailObj.unlike_value = jsonChildNode.optInt("unlike_value"); }
         if(jsonChildNode.has("IsTwitterPost")) { PostDetailObj.IsTwitterPost = jsonChildNode.optBoolean("IsTwitterPost"); }
         if(jsonChildNode.has("FeedBackMessage")) { PostDetailObj.FeedBackMessage = jsonChildNode.optString("FeedBackMessage"); }
         if(jsonChildNode.has("IsComment")) { PostDetailObj.IsComment = jsonChildNode.optBoolean("IsComment"); }
+        if(PostDetailObj.IsTwitterPost)  PostDetailObj.PostUrl = "https://twitter.com/"+PostDetailObj.infringing_user_id+"/status/"+PostDetailObj.post_id.split("-")[0];
+        else  PostDetailObj.PostUrl = "https://www.facebook.com/"+PostDetailObj.post_id.split("-")[0];
 
         return PostDetailObj;
 
@@ -206,5 +213,39 @@ import java.util.ArrayList;
         PostsLoadAsyncTask.friendsIds = new ArrayList<String>();
         PostsLoadAsyncTask.users = new ArrayList<User>();
     }
+
+    public static void disconnectFromFacebook(final Context context) {
+
+        if (AccessToken.getCurrentAccessToken() == null) {
+            return; // already logged out
+        }
+
+        new GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null, HttpMethod.GET, new GraphRequest
+                .Callback() {
+            @Override
+            public void onCompleted(GraphResponse graphResponse) {
+                if(graphResponse.getError()!=null)
+                {
+                    LoginManager.getInstance().logOut();
+                    SharedPreferenceHelper.removeDataFromSharedPreferences(context);
+                }
+            }
+        }).executeAsync();
+
+    }
+
+    public  void removeDataFromSharedPreferences(Context context)
+    {
+        SharedPreferences mySPrefs = context.getSharedPreferences("Login",0);
+        SharedPreferences.Editor editor = mySPrefs.edit();
+        editor.remove("AccessToken");
+        editor.remove("ApplicationId");
+        editor.remove("UserId");
+        editor.remove("Permissions");
+        editor.remove("DeclinedPermissions");
+        mySPrefs.edit().clear().apply();
+        editor.apply();
+    }
+
 
 }

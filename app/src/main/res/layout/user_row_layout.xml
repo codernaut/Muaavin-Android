@@ -4,13 +4,19 @@
 
 
 
+<!--
     <RelativeLayout
         android:id="@+id/r1"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
+-->
 
      <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:id="@+id/Textbox1" android:textSize="20dp"
+         android:layout_centerVertical="true"
+         android:ellipsize="end"
+         android:maxLines="1"
+         android:layout_toLeftOf="@+id/UserProfile"
         android:layout_toRightOf="@+id/Image_view"/>
 
     <ImageView
@@ -19,15 +25,16 @@
         android:layout_height="200px"
 
         />
+<!--
     </RelativeLayout>
+-->
     <Button
         android:id="@+id/UserProfile"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:layout_toRightOf="@+id/r1"
-        android:text="Show on Browser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show"
         android:textSize="15dp"
-
+        android:layout_alignParentRight="true"
         android:background="#3b5998"
 
         android:textColor="#ffffff"/>

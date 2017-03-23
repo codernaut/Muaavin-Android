@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import com.cfp.muaavin.facebook.FacebookUtil;
 import com.cfp.muaavin.facebook.UserInterface;
 import com.cfp.muaavin.helper.ClipBoardHelper;
@@ -20,6 +22,10 @@ import com.cfp.muaavin.facebook.User;
 import com.cfp.muaavin.web.DialogBox;
 import com.cfp.muaavin.web.FriendManagement;
 import com.cfp.muaavin.web.WebHttpGetReq;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.LoginManager;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -48,8 +54,6 @@ public  class MenuActivity extends AppCompatActivity implements  UserInterface ,
     private static final String TWITTER_SECRET = "H4KIPod4y561OXJ7u8Cd4EuGCtIofAi0HhR2hW80Ng84JgQaQ3";
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,10 +62,6 @@ public  class MenuActivity extends AppCompatActivity implements  UserInterface ,
         ///////////////////
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
-        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
-        //getSupportActionBar().setIcon(android.R.color.transparent);
-
         //////////////////
         setContentView(R.layout.activity_menu);
 
@@ -75,28 +75,28 @@ public  class MenuActivity extends AppCompatActivity implements  UserInterface ,
                 switch (item.getItemId()) {
                     case R.id.Report:
 
-                        if(selectedItem != item.getItemId())
+                        //if(selectedItem != item.getItemId())
                         {
                             selectedItem = item.getItemId();
-                            removeFragmentsFromStack();
+                            //removeFragmentsFromStack();
                             DialogBox.SelectReportOption(contex,"Select Option",ReportPostOption,1,user_id,MenuActivity.this,MenuActivity.this,false);
                         }  break;
 
                     case R.id.HighlightUsers:
 
-                        if(selectedItem != item.getItemId())
+                        //if(selectedItem != item.getItemId())
                         {   selectedItem = item.getItemId();
-                            removeFragmentsFromStack();
+                            //removeFragmentsFromStack();
                             DialogBox.SelectReportOption(contex,"Select Option",HighlightUserOption,1,user_id,MenuActivity.this,MenuActivity.this,false);
                         }  break;
 
                     case R.id.Browse:
-                        if(selectedItem != item.getItemId())
+                        //if(selectedItem != item.getItemId())
                         {
                             selectedItem = item.getItemId();
-                            removeFragmentsFromStack();
+                            //removeFragmentsFromStack();
                             DialogBox.SelectReportOption(contex,"Select Option",BrowseOption,1,user_id,MenuActivity.this,MenuActivity.this,false);
-                        }
+                        }   break;
                 }
                 return true;
 
@@ -169,9 +169,15 @@ public  class MenuActivity extends AppCompatActivity implements  UserInterface ,
         promptInputDialog(contex,MenuActivity.this);
     }
 
-    public  static void LogOut(/*View view*/)
+    public   void LogOut()
     {
-        LoginManager.getInstance().logOut();
+        LoginManager.getInstance().logOut(); // Logout from Facebook
+        //disconnectFromFacebook();
+        CookieSyncManager.createInstance(this);// Logout from Twitter
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeSessionCookie();
+        Twitter.getSessionManager().clearActiveSession();
+        session = null;   Twitter.logOut();
     }
 
 
@@ -228,7 +234,13 @@ public  class MenuActivity extends AppCompatActivity implements  UserInterface ,
         {
             getFragmentManager().popBackStack();
         }
-        else { super.onBackPressed(); }
+        else
+        {
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(startMain);
+        }
     }
 
     @Override
@@ -248,4 +260,6 @@ public  class MenuActivity extends AppCompatActivity implements  UserInterface ,
             getFragmentManager().popBackStack();
         }
     }
+
+
 }

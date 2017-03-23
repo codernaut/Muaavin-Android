@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.cfp.muaavin.facebook.Group;
 import com.cfp.muaavin.facebook.Post;
+import com.cfp.muaavin.ui.FacebookLoginActivity;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -29,7 +31,7 @@ public class GroupsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, Array
     public Context context;
     public  ArrayList<Group> Groups = new ArrayList<Group>();
     public GroupsResponse GroupResponseDelegate;
-    public String GroupName;
+    public String GroupName, Error;
 
     public  interface GroupsResponse
     {
@@ -41,6 +43,7 @@ public class GroupsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, Array
         context = contex;
         GroupName = groupName;
         GroupResponseDelegate = GroupResponse;
+        Error = "";
     }
 
     @Override
@@ -61,7 +64,8 @@ public class GroupsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, Array
 
         if (dialog.isShowing()) { dialog.dismiss(); }
 
-        GroupResponseDelegate.getGroups(Groups);
+        if(!Error.equals("")) { Toast.makeText(context, Error, Toast.LENGTH_LONG).show();}
+        else { GroupResponseDelegate.getGroups(Groups); }
     }
 
     public ArrayList<Group> getJsonGroupNames(GraphResponse response)
@@ -111,7 +115,7 @@ public class GroupsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, Array
                         }
                         else { noData[0] = true; }
                     }
-                    else { noData[0] = true; }
+                    else { noData[0] = true; Error = "Authentication failed , Please Login again to the app"; }
                 }
             });
             gr.executeAndWait();

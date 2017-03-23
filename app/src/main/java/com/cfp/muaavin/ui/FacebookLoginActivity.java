@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.cfp.muaavin.facebook.User;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -21,7 +20,6 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -57,31 +55,48 @@ public class FacebookLoginActivity extends ActionBarActivity  {
 
         context = FacebookLoginActivity.this;
 
+
+        SharedPreferences sp = getSharedPreferences("Login", 0); // Get data from Shared Preferences...
+
+        if(AccessToken.getCurrentAccessToken()!=null)
+        {
+            removeDataFromSharedPreferences();
+            Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
+            intent.putExtra("User_signedID", /*sp.getString("UserId", "")*/String.valueOf(AccessToken.getCurrentAccessToken().getUserId()));
+            startActivity(intent);
+        }
+        else {
+            if (!sp.getString("AccessToken", "").equals("")) {
+                AccessToken accessToken = new AccessToken(sp.getString("AccessToken", ""), sp.getString("ApplicationId", ""), sp.getString("UserId", ""), sp.getStringSet("Permissions", null), sp.getStringSet("DeclinedPermissions", null), null, null, null);
+                AccessToken.setCurrentAccessToken(accessToken);
+                Profile profile = new Profile(sp.getString("ProfileId"  , ""), sp.getString("FirstName", ""), sp.getString("MiddleName", ""), sp.getString("LastName", ""), sp.getString("Name", ""), Uri.parse(sp.getString("Url", "")));
+                Profile.setCurrentProfile(profile);
+                user_id = sp.getString("UserId", "");
+            }
+            /*disconnectFromFacebook(this);*/
+        }
+
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
                    SharedPreferences sp = getSharedPreferences("Login", 0); // Get data from Shared Preferences...
+                   // if Shared Preferences contains access token
+                   if (AccessToken.getCurrentAccessToken()!=null/*!sp.getString("AccessToken", "").equals("")*/) {
 
-                   if (!sp.getString("AccessToken", "").equals("")) {
-
-                      AccessToken accessToken = new AccessToken(sp.getString("AccessToken", ""), sp.getString("ApplicationId", ""), sp.getString("UserId", ""), sp.getStringSet("Permissions", null), sp.getStringSet("DeclinedPermissions", null), null, null, null);
-                      AccessToken.setCurrentAccessToken(accessToken);
-                      Profile profile = new Profile(sp.getString("ProfileId", ""), sp.getString("FirstName", ""), sp.getString("MiddleName", ""), sp.getString("LastName", ""), sp.getString("Name", ""), Uri.parse(sp.getString("Url", "")));
-                      Profile.setCurrentProfile(profile);
-                      /////////
-                      //new GroupsLoadAsyncTask(context).execute(new ArrayList<Post>());
-                      ////////
-                      if(!checkBox.isChecked()){ removeDataFromSharedPreferences(); }
-
+                   if(!checkBox.isChecked()){ removeDataFromSharedPreferences(); }
+                   else
+                   {   SharedPreferences.Editor Ed = sp.edit();
+                       Ed.putString("AccessToken", AccessToken.getCurrentAccessToken().getToken()).putString("ApplicationId", AccessToken.getCurrentAccessToken().getApplicationId()).putStringSet("Permissions", AccessToken.getCurrentAccessToken().getPermissions()).putStringSet("DeclinedPermissions", AccessToken.getCurrentAccessToken().getDeclinedPermissions()).putString("UserId", AccessToken.getCurrentAccessToken().getUserId()).putString("ProfileId", Profile.getCurrentProfile().getId()).putString("Name", Profile.getCurrentProfile().getName()).putString("Url", Profile.getCurrentProfile().getProfilePictureUri(20, 20).toString()).putString("access_expires",AccessToken.getCurrentAccessToken().getExpires().toString());
+                       Ed.commit();
+                   }
                          Intent intent = new Intent(FacebookLoginActivity.this, MenuActivity.class);
-                         intent.putExtra("User_signedID", sp.getString("UserId", ""));
+                         intent.putExtra("User_signedID", /*sp.getString("UserId", "")*/user_id);
                          startActivity(intent);
-                      }
+                   }
                    else {
                         callbackManager = CallbackManager.Factory.create();
                         LoginManager.getInstance().logInWithReadPermissions(FacebookLoginActivity.this, Arrays.asList("email", "user_status", "user_photos", "user_videos", "user_tagged_places", "user_actions.video", "user_posts", "user_friends", "public_profile", "read_page_mailboxes", "read_custom_friendlists"));
-
                         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
 
@@ -152,28 +167,17 @@ public class FacebookLoginActivity extends ActionBarActivity  {
         request.executeAsync();
     }
 
-    public void getGroups()
-    {
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/"+Profile.getCurrentProfile().getId()+"/groups",
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                    /* handle the result */
-                        response.toString();
-                    }
-                }
-        ).executeAsync();
-    }
 
-    public void removeDataFromSharedPreferences()
+    public  void removeDataFromSharedPreferences()
     {
-        SharedPreferences mySPrefs = getSharedPreferences("Login",0);
+        SharedPreferences mySPrefs = context.getSharedPreferences("Login",0);
         SharedPreferences.Editor editor = mySPrefs.edit();
         editor.remove("AccessToken");
         editor.remove("ApplicationId");
+        editor.remove("UserId");
+        editor.remove("Permissions");
+        editor.remove("DeclinedPermissions");
+        mySPrefs.edit().clear().apply();
         editor.apply();
     }
 

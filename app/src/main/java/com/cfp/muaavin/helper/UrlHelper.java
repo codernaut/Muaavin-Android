@@ -54,7 +54,6 @@ public class UrlHelper {
         String story_fbid = uri.getQueryParameter("story_fbid");
         String id = uri.getQueryParameter("id");
         post_id = id+"_"+story_fbid;
-
         return post_id;
     }
 }
