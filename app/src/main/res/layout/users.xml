@@ -10,15 +10,16 @@
 
 
     <ListView android:id="@+id/listView2"
-        android:layout_height="440dp"
+        android:layout_height="match_parent"
         android:layout_width="fill_parent"
+        android:layout_above="@+id/LoadButton"
         />
 
 
     <Button android:id="@+id/LoadButton"
-        android:layout_below="@+id/listView2"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
+        android:layout_alignParentBottom="true"
         android:text="Load more Users"
         android:onClick="LoadUsers"/>
 

@@ -20,10 +20,8 @@ import com.cfp.muaavin.adapter.Posts_CustomAdapter;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.adapter.Users_CustomAdapter;
 import com.cfp.muaavin.facebook.User;
-
 import java.util.ArrayList;
 
-import static com.cfp.muaavin.ui.MenuActivity.LogOut;
 
 
 public class Post_ListView extends Fragment implements AsyncResponsePosts {
@@ -40,22 +38,15 @@ public class Post_ListView extends Fragment implements AsyncResponsePosts {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
-        ///////////////////
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setHomeButtonEnabled(true);
-        //////////////////
-        //setContentView(R.layout.activity_list_view);
+
         View view  = inflater.inflate(R.layout.activity_list_view, container, false);
         context = getActivity();
-        /////////////////
         SelectivePosts = (ArrayList<Post>)  getArguments().getSerializable("user_posts");
         User_Posts = new ArrayList<Post>();
 
         ClipBoardOption = getArguments().getBoolean("ClipBoardOption", false);
         GroupPostOption = getArguments().getBoolean("GroupPostOption", false);
         IsTwitterData =   getArguments().getBoolean("isTwitterData", false);
-       //////////////////
         loadPosts=(Button) view.findViewById(R.id.LoadPosts);
         lv=(ListView) view.findViewById(R.id.listView1);
         Posts_CustomAdapter c = new Posts_CustomAdapter(getActivity(), SelectivePosts , User.getLoggedInUserInformation().id,ClipBoardOption,GroupPostOption);
@@ -91,25 +82,4 @@ public class Post_ListView extends Fragment implements AsyncResponsePosts {
         lv.setAdapter(c);
         //((BaseAdapter) lv.getAdapter()).notifyDataSetChanged();
     }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.layout, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_new_quote:
-                // TODO put your code here to respond to the button tap
-                LogOut();
-                Intent intent = new Intent(Post_ListView.this,FacebookLoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-
-            default:  return super.onOptionsItemSelected(item);
-        }
-    }*/
 }

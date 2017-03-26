@@ -4,12 +4,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.Comment;
 import com.cfp.muaavin.facebook.FacebookUtil;
 import com.cfp.muaavin.facebook.Post;
 import com.cfp.muaavin.facebook.User;
+import com.cfp.muaavin.ui.FacebookLoginActivity;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -38,7 +40,7 @@ public class PostsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayL
     public ArrayList<Comment> comments = new ArrayList<Comment>();
     public static ArrayList<String>  friendsIds = new ArrayList<String>();
     boolean isClipboardData;
-    String Option;
+    String Option , Error;
 
 
     public PostsLoadAsyncTask(String option, Context context, AsyncResponsePosts delegate , String user_id, boolean isClipboardData, String post_id, ArrayList<Post> Posts, ArrayList<User> users) {
@@ -51,6 +53,7 @@ public class PostsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayL
         this.Posts = Posts;
         this.context = context;
         Option = option;
+        Error = "";
     }
 
     @Override
@@ -87,14 +90,15 @@ public class PostsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayL
     protected void onPostExecute(ArrayList<Post> result)
     {
         if (dialog.isShowing()) { dialog.dismiss(); }
-        delegate.getUserAndPostData(result,Option);
+        if(!Error.equals("")) { Toast.makeText(context, Error, Toast.LENGTH_LONG).show();}
+        else { delegate.getUserAndPostData(result,Option); }
     }
 
     public ArrayList<Post> getAllPosts(final ArrayList<Post> posts)
     {
         if(count == 0) {
             Bundle params = new Bundle();
-            params.putString("limit","10");
+            params.putString("limit","20");
             params.putString("fields", "from{id,name,picture},message,full_picture,story,created_time,picture,comments.summary(true){from{id,name,picture},id,message,comments{from{id,name,picture},id,message}}");//,comments.summary(true)
             new GraphRequest(AccessToken.getCurrentAccessToken(),
             "/"+Post_ID+"/feed",
@@ -102,9 +106,12 @@ public class PostsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayL
             HttpMethod.GET,
             new GraphRequest.Callback() {
             public void onCompleted(GraphResponse response) {
-            lastGraphResponse = response;
-            Posts = facebookUtil.getJsonDataPosts(response,posts);
-            getCommentsAndReplies();
+            if(response.getError()==null) {
+                lastGraphResponse = response;
+                Posts = facebookUtil.getJsonDataPosts(response, posts);
+                getCommentsAndReplies();
+            } else {Error = "Authentication failed , Please Login again to the app";}
+
             }
             }).executeAndWait();
 
@@ -118,9 +125,11 @@ public class PostsLoadAsyncTask extends AsyncTask<ArrayList<Post> , Void, ArrayL
             nextResultsRequests.setCallback(new GraphRequest.Callback() {
             @Override
             public void onCompleted(GraphResponse response) {
-            lastGraphResponse = response;
-            Posts = facebookUtil.getJsonDataPosts(response, posts);
-            getCommentsAndReplies();
+            if(response.getError()==null) {
+                lastGraphResponse = response;
+                Posts = facebookUtil.getJsonDataPosts(response, posts);
+                getCommentsAndReplies();
+            } else { Error = "Authentication failed , Please Login again to the app"; }
             }});
             nextResultsRequests.executeAndWait();
             }

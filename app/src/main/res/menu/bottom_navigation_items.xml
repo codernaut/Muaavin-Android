@@ -5,19 +5,19 @@
         <item
         android:id="@+id/Report"
         android:title="Report"
-        android:icon="@drawable/unlike_thumb"
+        android:icon="@drawable/report"
         />
 
         <item
         android:id="@+id/Browse"
         android:title="Browse"
-        android:icon="@drawable/group"
+        android:icon="@drawable/search"
         />
 
          <item
         android:id="@+id/HighlightUsers"
         android:title="Highlight Users"
-        android:icon="@drawable/group"
+        android:icon="@drawable/highlight"
         />
 
 

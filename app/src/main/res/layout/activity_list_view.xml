@@ -8,8 +8,9 @@
     tools:context="com.cfp.muaavin.ui.Post_ListView">
 
     <ListView android:id="@+id/listView1"
-        android:layout_height="440dp"
+        android:layout_height="match_parent"
         android:layout_width="fill_parent"
+        android:layout_above="@+id/LoadPosts"
         />
 
 
@@ -18,9 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:text="Load more Posts"
-
-        android:layout_below="@+id/listView1"
-
+        android:layout_alignParentBottom="true"
         android:onClick="loadPosts"/>
 
 

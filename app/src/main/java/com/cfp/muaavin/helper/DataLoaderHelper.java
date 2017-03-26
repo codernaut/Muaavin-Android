@@ -1,11 +1,8 @@
 package com.cfp.muaavin.helper;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-
 import com.cfp.muaavin.facebook.AsyncResponsePosts;
 import com.cfp.muaavin.facebook.FacebookUtil;
 import com.cfp.muaavin.facebook.Group;
@@ -23,7 +20,6 @@ import com.cfp.muaavin.ui.GroupsListView;
 import com.cfp.muaavin.ui.Post_ListView;
 import com.cfp.muaavin.ui.R;
 import com.cfp.muaavin.ui.Tweet_ListView;
-import com.cfp.muaavin.ui.TwitterLoginActivity;
 import com.cfp.muaavin.ui.UiUpdate;
 import com.cfp.muaavin.ui.Users_ListView;
 import com.cfp.muaavin.web.DialogBox;
@@ -86,7 +82,8 @@ public class DataLoaderHelper implements TweetsAsynchronousResponse, AsyncRespon
         }
         else if(dataType.equals("Twitter"))
         {
-            if(check == 5)  new WebHttpGetReq(context,activity,  check,null, this).execute("http://13.76.175.64:8080/Muaavin-Web/rest/TweetQuery/AddTweet?User_ID="+AesEncryption.encrypt(User.getTwitterUserLoggedInInformation().id)+"&User_Name="+AesEncryption.encrypt(User.getTwitterUserLoggedInInformation().name)+"&User_ImageUrl="+AesEncryption.encrypt("hoiu")+"&Tweet_ID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_id)+"&Message="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_Detail)+"&ImageUrl="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_image)+"&Group_Name="+AesEncryption.encrypt(Group_name)+"&InfringingUserID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_id)+"&InfringingUserName="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_name)+"&InfringingUserProfilePic="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic)) ;
+            String pic = UrlHelper.getEncodedUrl(User.getTwitterUserLoggedInInformation().profile_pic);
+            if(check == 5)  new WebHttpGetReq(context,activity,  check,null, this).execute("http://13.76.175.64:8080/Muaavin-Web/rest/TweetQuery/AddTweet?User_ID="+AesEncryption.encrypt(User.getTwitterUserLoggedInInformation().id)+"&User_Name="+AesEncryption.encrypt(User.getTwitterUserLoggedInInformation().name)+"&User_ImageUrl="+AesEncryption.encrypt(UrlHelper.getEncodedUrl(User.getTwitterUserLoggedInInformation().profile_pic))+"&Tweet_ID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_id)+"&Message="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_Detail)+"&ImageUrl="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.post_image)+"&Group_Name="+AesEncryption.encrypt(Group_name)+"&InfringingUserID="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_id)+"&InfringingUserName="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_name)+"&InfringingUserProfilePic="+AesEncryption.encrypt(TwitterUtil.ReportTwitterDetail.infringing_user_profile_pic)) ;
             else if(check == 7) new WebHttpGetReq(context,activity,check,null,this).execute("http://13.76.175.64:8080/Muaavin-Web/rest/Users/Highlights?name=" + AesEncryption.encrypt(Group_name)+"&user_id="+AesEncryption.encrypt(User.getTwitterUserLoggedInInformation().id)+"&specificUserFriends="+true+"&isTwitterData="+true);
         }
     }
@@ -132,9 +129,6 @@ public class DataLoaderHelper implements TweetsAsynchronousResponse, AsyncRespon
             {
                 ClipBoard_Posts = results; // Get Asynchronous Posts Result
                 FacebookUtil.users = PostsLoadAsyncTask.users; // Get users from Clipboard post
-                /*Intent intent = new Intent(context, Post_ListView.class);
-                intent.putExtra("User_id", Profile.getCurrentProfile().getId()).putExtra("user_posts", ClipBoard_Posts).putExtra("GroupPostOption", false).putExtra("ClipBoardOption", true).putExtra("isTwitterData", false);
-                context.startActivity(intent);*/
                 Post_ListView frag = new Post_ListView();  Bundle args = new Bundle();
                 args.putString("User_id", Profile.getCurrentProfile().getId()); args.putSerializable("user_posts", ClipBoard_Posts); args.putBoolean("GroupPostOption", false); args.putBoolean("ClipBoardOption", true); args.putBoolean("isTwitterData", false);
                 frag.setArguments(args); FragmentManager fragmentManager = activity.getFragmentManager();

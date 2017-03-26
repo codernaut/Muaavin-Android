@@ -97,7 +97,6 @@ public class BrowsePostCustomAdapter extends BaseAdapter  {
             holder.PostHeading.setText("Tweet");
         }
 
-
         holder.CrossButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,8 +121,8 @@ public class BrowsePostCustomAdapter extends BaseAdapter  {
             }
         });
 
-        Posts.get(position).image = UrlHelper.getDecodedUrl((Posts.get(position).image));
-        new ImageSelectorAsyncTask(holder.post_image, holder.PostTextview).execute(Posts.get(position).image);
+        /*Posts.get(position).image = UrlHelper.getDecodedUrl((Posts.get(position).image));
+        new ImageSelectorAsyncTask(holder.post_image, holder.PostTextview).execute(Posts.get(position).image);*/
 
 
 

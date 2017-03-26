@@ -76,7 +76,7 @@ public class Posts_CustomAdapter extends BaseAdapter {
 
         ImageView img;
 
-        TextView tv3;
+        TextView CommentHeading;
 
         TextView postTextView;
 
@@ -99,10 +99,12 @@ public class Posts_CustomAdapter extends BaseAdapter {
 
         holder.tv1.setText(" "+ result.get(position).message);
 
+        if(result.get(position).Comments.size() == 0) holder.CommentHeading.setVisibility(View.GONE);
+
         for (int i = 0; i < result.get(position).Comments.size(); i++) {
 
         final TextView rowTextView =  getRowTextView( result.get(position).Comments.get(i).message);
-        final int num = i;
+        final int num = i;      if(result.get(position).Comments.get(i).message.equals("")) continue; // if comment contains stckers
         rowTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +124,8 @@ public class Posts_CustomAdapter extends BaseAdapter {
                 for(int reply_index = 0 ; reply_index < result.get(position).Comments.get(i).replies.size(); reply_index++)
                 {
                     final int  index = reply_index;
+                    if(result.get(position).Comments.get(num).replies.get(reply_index).message.equals("")) continue; //if reply contains sticker
+
                     final TextView replyTextView =  getRowTextView( result.get(position).Comments.get(num).replies.get(index).message);
                     replyTextView.setOnClickListener(new View.OnClickListener()
                     {
@@ -154,7 +158,8 @@ public class Posts_CustomAdapter extends BaseAdapter {
             }
         });
 
-        new ImageSelectorAsyncTask(holder.img, holder.tv1).execute(result.get(position).image);
+        if(result.get(position).image.equals(""))  holder.img.setVisibility(View.GONE); // if Post does not contain Image
+        else { new ImageSelectorAsyncTask(holder.img, holder.tv1).execute(result.get(position).image); }
         return rowView;
     }
 
@@ -185,11 +190,10 @@ public class Posts_CustomAdapter extends BaseAdapter {
         Holder holder = new Holder();
         holder.tv1=(TextView) rowView.findViewById(R.id.Textbox1);
         holder.img=(ImageView) rowView.findViewById(R.id.Image_view);
-        holder.tv3 = (TextView)rowView.findViewById(R.id.Textbox3);
+        holder.CommentHeading = (TextView)rowView.findViewById(R.id.CommentHeading);
         holder.postTextView = (TextView)rowView.findViewById(R.id.Textbox2);
         holder.PostDetail = (TextView)rowView.findViewById(R.id.Textbox1);
         return holder;
-
     }
 
     public String removeHash(String text, String replacedValue, String replaceWith )
